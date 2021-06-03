@@ -18,9 +18,11 @@ public class ConfigHandler {
 		final Pair<ClientConfig, ForgeConfigSpec> client = new ForgeConfigSpec.Builder().configure(ClientConfig::new);
 		CLIENT = client.getLeft();
 		CLIENT_SPEC = client.getRight();
+
 		final Pair<CommonConfig, ForgeConfigSpec> common = new ForgeConfigSpec.Builder().configure(CommonConfig::new);
 		COMMON = common.getLeft();
 		COMMON_SPEC = common.getRight();
+
 		final Pair<ServerConfig, ForgeConfigSpec> server = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
 		SERVER = server.getLeft();
 		SERVER_SPEC = server.getRight();
