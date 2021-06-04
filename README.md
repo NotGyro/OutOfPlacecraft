@@ -9,7 +9,7 @@ An [Out of Placers](https://www.valsalia.com/comic/prologue/01/) mod for Minecra
 ## Liscence
 
 Liscenced under the LGPL and CC-BY-SA, see
-[LISCENCE.md](https://github.com/NotGyro/OutOfPlacecraft/blob/master/LISCENCE.md)
+[LISCENCE.md](https://github.com/NotGyro/OutOfPlacecraft/blob/master/LICENSE.md)
 for details.
 
 ## Authors

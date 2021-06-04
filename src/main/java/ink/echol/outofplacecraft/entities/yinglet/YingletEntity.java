@@ -19,44 +19,90 @@
  */
 package ink.echol.outofplacecraft.entities.yinglet;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import ink.echol.outofplacecraft.OutOfPlacecraftMod;
+import net.minecraft.entity.*;
+import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.HandSide;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.Heightmap;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
-public class YingletEntity extends LivingEntity implements IAnimatable {
-	protected YingletEntity(final EntityType<? extends LivingEntity> p_i48577_1_, final World p_i48577_2_) {
-		super(p_i48577_1_, p_i48577_2_);
+import java.util.Collections;
+
+@Mod.EventBusSubscriber(modid = OutOfPlacecraftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+public class YingletEntity extends CreatureEntity implements IAnimatable {
+	public static final EntityType<YingletEntity> ENTITY_TYPE = new EntityType<>(
+			YingletEntity::new, // Factory
+			EntityClassification.MISC, // Category
+			true, // Serialize
+			false, // Summon
+			false, // Fire immune
+			false, // Can spawn far from player
+			ImmutableSet.of(), // Immune to
+			EntitySize.fixed(1f, 1f), // Dimensions
+			0, // Client Tracking Range
+			0 // Update Interval
+	);
+
+	public static final Item SPAWN_EGG = new SpawnEggItem(
+			ENTITY_TYPE,
+			0x000000, // eggPrimary ???
+			0xFFFFFF, // eggSecondary ???
+			(new Item.Properties()).tab(ItemGroup.TAB_MISC)
+	);
+
+	@SubscribeEvent
+	public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
+		YingletEntity.ENTITY_TYPE.setRegistryName(new ResourceLocation(OutOfPlacecraftMod.MODID, "yinglet"));
+		event.getRegistry().register(YingletEntity.ENTITY_TYPE);
+	}
+
+	@SubscribeEvent
+	public static void registerSpawnEggs(RegistryEvent.Register<Item> event) {
+		SPAWN_EGG.setRegistryName(new ResourceLocation(OutOfPlacecraftMod.MODID, "yinglet_spawn_egg"));
+		event.getRegistry().register(SPAWN_EGG);
+	}
+
+	public YingletEntity(final EntityType<? extends CreatureEntity> type, final World world_in) {
+		super(type, world_in);
 	}
 
 	@Override
 	public Iterable<ItemStack> getArmorSlots() {
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override
-	public ItemStack getItemBySlot(final EquipmentSlotType p_184582_1_) {
-		return null;
+	public ItemStack getItemBySlot(final EquipmentSlotType slot) {
+		return ItemStack.EMPTY;
 	}
 
 	@Override
-	public void setItemSlot(final EquipmentSlotType p_184201_1_, final ItemStack p_184201_2_) {
+	public void setItemSlot(final EquipmentSlotType slot, final ItemStack stack) {
 
 	}
 
 	@Override
 	public HandSide getMainArm() {
-		return null;
+		return HandSide.RIGHT;
 	}
 
 	@Override
 	public void registerControllers(final AnimationData data) {
-
+		// TODO Figure out animations I guess?
 	}
 
 	@Override
