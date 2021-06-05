@@ -127,9 +127,6 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
-    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
-    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.16.5-36.1.23'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
@@ -162,7 +159,7 @@ jar {
             "Specification-Vendor"      : "clubhousers",
             "Specification-Version"     : "1",
             "Implementation-Title"      : project.name,
-            "Implementation-Version"    : "${project.version}",
+            "Implementation-Version"    : project.version.toString(),
             "Implementation-Vendor"     : "clubhousers",
             "Implementation-Timestamp"  : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
