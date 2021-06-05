@@ -36,7 +36,6 @@ public class YingletModel extends AnimatedGeoModel<YingletEntity> {
 
 	@Override
 	public ResourceLocation getAnimationFileLocation(final YingletEntity animatable) {
-		//return new ResourceLocation(OutOfPlacecraftMod.MODID, "animations/yinglet.animation.json");
-		return null;
+		return new ResourceLocation(OutOfPlacecraftMod.MODID, "animations/yinglet.animation.json");
 	}
 }
