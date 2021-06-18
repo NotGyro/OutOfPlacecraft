@@ -1,0 +1,25 @@
+{
+  "type":"block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "minecraft:sand",
+          "weight": 1
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "item",
+          "name": "outofplacecraft:clam",
+          "weight": 1
+        }
+      ]
+    }
+  ]
+}

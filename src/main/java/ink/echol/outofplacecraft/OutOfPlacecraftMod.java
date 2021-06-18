@@ -19,13 +19,18 @@
  */
 package ink.echol.outofplacecraft;
 
+import ink.echol.outofplacecraft.blocks.BlockRegistry;
+import ink.echol.outofplacecraft.items.ItemRegistry;
 import ink.echol.outofplacecraft.config.ConfigHandler;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import software.bernie.geckolib3.GeckoLib;
+
 
 @Mod("outofplacecraft")
 public class OutOfPlacecraftMod
@@ -41,6 +46,10 @@ public class OutOfPlacecraftMod
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigHandler.COMMON_SPEC);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ConfigHandler.SERVER_SPEC);
 
+        // Register blocks and items. (MUST BE IN THAT ORDER, for BlockItems)
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        BlockRegistry.BLOCKS.register(bus);
+        ItemRegistry.ITEMS.register(bus);
         //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         //MinecraftForge.EVENT_BUS.register(this);
     }

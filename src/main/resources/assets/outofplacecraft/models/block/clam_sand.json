@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "up": "outofplacecraft:block/clam_sand",
+    "particle": "minecraft:block/sand", 
+    "down": "minecraft:block/sand",
+    "north": "minecraft:block/sand",
+    "south": "minecraft:block/sand",
+    "east": "minecraft:block/sand",
+    "west": "minecraft:block/sand"
+  }
+}
