@@ -19,10 +19,11 @@
  */
 package ink.echol.outofplacecraft.config;
 
+import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 public class CommonConfig {
-	CommonConfig(ForgeConfigSpec.Builder builder) {
 
+	CommonConfig(ForgeConfigSpec.Builder builder) {
 	}
 }
