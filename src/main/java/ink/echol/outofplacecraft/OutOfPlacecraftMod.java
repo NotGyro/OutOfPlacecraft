@@ -23,7 +23,10 @@ import ink.echol.outofplacecraft.blocks.BlockRegistry;
 import ink.echol.outofplacecraft.items.ItemRegistry;
 import ink.echol.outofplacecraft.config.ConfigHandler;
 import ink.echol.outofplacecraft.world.WorldEvents;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -62,4 +65,5 @@ public class OutOfPlacecraftMod
         bus.addListener(WorldEvents::commonSetup);
         MinecraftForge.EVENT_BUS.addListener(WorldEvents::onBiomeLoad);
     }
+
 }
