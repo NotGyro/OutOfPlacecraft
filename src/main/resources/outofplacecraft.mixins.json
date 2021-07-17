@@ -1,0 +1,10 @@
+{
+  "compatibilityLevel": "JAVA_8",
+  "package": "ink.echol.outofplacecraft.mixin",
+  "refmap": "outofplacecraft.refmap.json",
+  "mixins": [
+    "MixinPlayer"
+  ],
+  "client": [],
+  "server": []
+}

@@ -24,6 +24,7 @@ import ink.echol.outofplacecraft.items.ItemRegistry;
 import ink.echol.outofplacecraft.config.ConfigHandler;
 import ink.echol.outofplacecraft.world.WorldEvents;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -59,5 +60,6 @@ public class OutOfPlacecraftMod
         MinecraftForge.EVENT_BUS.register(this);
         //Make sure World Events gets a listener.
         bus.addListener(WorldEvents::commonSetup);
+        MinecraftForge.EVENT_BUS.addListener(WorldEvents::onBiomeLoad);
     }
 }
