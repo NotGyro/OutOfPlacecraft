@@ -23,19 +23,19 @@ import ink.echol.outofplacecraft.OutOfPlacecraftMod;
 import net.minecraft.util.ResourceLocation;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 
-public class YingletModel extends AnimatedGeoModel<YingletEntity> {
+public class YingletModel extends AnimatedGeoModel {
 	@Override
-	public ResourceLocation getModelLocation(final YingletEntity object) {
+	public ResourceLocation getModelLocation(Object entity) {
 		return new ResourceLocation(OutOfPlacecraftMod.MODID, "geo/yinglet.geo.json");
 	}
 
 	@Override
-	public ResourceLocation getTextureLocation(final YingletEntity object) {
+	public ResourceLocation getTextureLocation(Object entity) {
 		return new ResourceLocation(OutOfPlacecraftMod.MODID, "textures/yinglet/default.png");
 	}
 
 	@Override
-	public ResourceLocation getAnimationFileLocation(final YingletEntity animatable) {
+	public ResourceLocation getAnimationFileLocation(Object entity) {
 		return new ResourceLocation(OutOfPlacecraftMod.MODID, "animations/yinglet.animation.json");
 	}
 }

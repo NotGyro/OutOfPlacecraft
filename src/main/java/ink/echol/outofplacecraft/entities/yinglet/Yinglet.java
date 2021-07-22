@@ -19,14 +19,10 @@
  */
 package ink.echol.outofplacecraft.entities.yinglet;
 
-import com.google.common.collect.ImmutableSet;
 import ink.echol.outofplacecraft.OutOfPlacecraftMod;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -35,30 +31,15 @@ import net.minecraft.item.SpawnEggItem;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLLoader;
-import software.bernie.example.GeckoLibMod;
-import software.bernie.example.client.renderer.armor.PotatoArmorRenderer;
-import software.bernie.example.client.renderer.entity.BikeGeoRenderer;
-import software.bernie.example.client.renderer.entity.ExampleGeoRenderer;
-import software.bernie.example.client.renderer.entity.ReplacedCreeperRenderer;
-import software.bernie.example.client.renderer.tile.BotariumTileRenderer;
-import software.bernie.example.client.renderer.tile.FertilizerTileRenderer;
-import software.bernie.example.entity.ReplacedCreeperEntity;
-import software.bernie.example.item.PotatoArmorItem;
-import software.bernie.example.registry.BlockRegistry;
-import software.bernie.example.registry.EntityRegistry;
-import software.bernie.example.registry.TileRegistry;
-import software.bernie.geckolib3.GeckoLib;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -66,23 +47,32 @@ import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.renderers.geo.GeoArmorRenderer;
-import software.bernie.geckolib3.renderers.geo.GeoReplacedEntityRenderer;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 
 @Mod.EventBusSubscriber(modid = OutOfPlacecraftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class YingletEntity extends CreatureEntity implements IAnimatable {
+public class Yinglet extends CreatureEntity implements IAnimatable {
 
-	public static final EntityType<YingletEntity> ENTITY_TYPE = EntityType.Builder
-			.of(YingletEntity::new, EntityClassification.CREATURE)
+	public Yinglet(final EntityType<? extends CreatureEntity> type, final World world_in) {
+		super(type, world_in);
+		this.noCulling = true;
+	}
+
+	public static final EntityType<Yinglet> ENTITY_TYPE = EntityType.Builder
+			.of(Yinglet::new, EntityClassification.CREATURE)
 			.sized(1, 1)
-			.build("yinglet");
+			.build(Yinglet.class.getSimpleName().toLowerCase());
+
+	@Override
+	public EntityType<?> getType() {
+		return ENTITY_TYPE;
+	}
 
 	@SubscribeEvent
 	public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
-		YingletEntity.ENTITY_TYPE.setRegistryName(new ResourceLocation(OutOfPlacecraftMod.MODID, "yinglet"));
-		event.getRegistry().register(YingletEntity.ENTITY_TYPE);
+		Yinglet.ENTITY_TYPE.setRegistryName(new ResourceLocation(OutOfPlacecraftMod.MODID, Yinglet.class.getSimpleName().toLowerCase()));
+		event.getRegistry().register(Yinglet.ENTITY_TYPE);
 	}
 
 	@SubscribeEvent
@@ -96,6 +86,11 @@ public class YingletEntity extends CreatureEntity implements IAnimatable {
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void registerRenderers(final FMLClientSetupEvent event) {
+		System.out.println("Bloop!!!");
+		System.out.println(ENTITY_TYPE.getRegistryName().toString());
+
+		System.out.println(Yinglet.class.getSimpleName().toLowerCase());
+
 		RenderingRegistry.registerEntityRenderingHandler(
 				ENTITY_TYPE,
 				YingletRenderer::new
@@ -117,10 +112,6 @@ public class YingletEntity extends CreatureEntity implements IAnimatable {
 
 
 	private AnimationFactory animationFactory = new AnimationFactory(this);
-
-	public YingletEntity(final EntityType<? extends CreatureEntity> type, final World world_in) {
-		super(type, world_in);
-	}
 
 	@Override
 	public Iterable<ItemStack> getArmorSlots() {
@@ -155,5 +146,10 @@ public class YingletEntity extends CreatureEntity implements IAnimatable {
 	@Override
 	public AnimationFactory getFactory() {
 		return this.animationFactory;
+	}
+
+	@Override
+	public boolean shouldRender(double p_145770_1_, double p_145770_3_, double p_145770_5_) {
+		return true; //TODO
 	}
 }

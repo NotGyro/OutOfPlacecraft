@@ -20,19 +20,22 @@
 package ink.echol.outofplacecraft;
 
 import ink.echol.outofplacecraft.blocks.BlockRegistry;
+import ink.echol.outofplacecraft.capabilities.CapabilityRegistry;
+import ink.echol.outofplacecraft.entities.yinglet.Yinglet;
+import ink.echol.outofplacecraft.entities.yinglet.YingletRenderer;
 import ink.echol.outofplacecraft.items.ItemRegistry;
 import ink.echol.outofplacecraft.config.ConfigHandler;
 import ink.echol.outofplacecraft.world.WorldEvents;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -41,7 +44,7 @@ import software.bernie.geckolib3.GeckoLib;
 
 
 @Mod("outofplacecraft")
-@Mod.EventBusSubscriber(modid = OutOfPlacecraftMod.MODID)
+@Mod.EventBusSubscriber(modid = OutOfPlacecraftMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class OutOfPlacecraftMod
 {
     public static final String MODID = "outofplacecraft";
@@ -58,12 +61,22 @@ public class OutOfPlacecraftMod
         // Register blocks and items. (MUST BE IN THAT ORDER, for BlockItems)
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         BlockRegistry.BLOCKS.register(bus);
-        ItemRegistry.ITEMS.register(bus);
         //FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
         //Make sure World Events gets a listener.
         bus.addListener(WorldEvents::commonSetup);
         MinecraftForge.EVENT_BUS.addListener(WorldEvents::onBiomeLoad);
+        ItemRegistry.ITEMS.register(bus);
     }
 
+    @SubscribeEvent
+    static void commonSetup(final FMLCommonSetupEvent event) {
+        CapabilityRegistry.initCapabilities();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    public static void registerRenderers(final FMLClientSetupEvent event) {
+        RenderingRegistry.registerEntityRenderingHandler(Yinglet.ENTITY_TYPE, YingletRenderer::new);
+    }
 }
