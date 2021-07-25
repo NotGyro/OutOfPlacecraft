@@ -16,6 +16,9 @@ public class ItemRegistry {
     );
     // ITEMS
     public static final RegistryObject<Item> CLAM = ITEMS.register("clam",
-        () -> new Item(new Item.Properties().tab(ItemGroup.TAB_FOOD))
+            () -> new Item(new Item.Properties().tab(ItemGroup.TAB_FOOD))
+    );
+    public static final RegistryObject<Item> ZAT_ZHING = ITEMS.register("zatzhing",
+            () -> new ZatZhingItem(new Item.Properties().tab(ItemGroup.TAB_MISC))
     );
 }

@@ -25,6 +25,7 @@ import ink.echol.outofplacecraft.entities.yinglet.Yinglet;
 import ink.echol.outofplacecraft.entities.yinglet.YingletRenderer;
 import ink.echol.outofplacecraft.items.ItemRegistry;
 import ink.echol.outofplacecraft.config.ConfigHandler;
+import ink.echol.outofplacecraft.net.OOPCPacketHandler;
 import ink.echol.outofplacecraft.world.WorldEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -51,6 +52,9 @@ public class OutOfPlacecraftMod
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    public static boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
+            getInputArguments().toString().indexOf("-agentlib:jdwp") > 0;
+
     public OutOfPlacecraftMod() {
         GeckoLib.initialize();
 
@@ -72,6 +76,7 @@ public class OutOfPlacecraftMod
     @SubscribeEvent
     static void commonSetup(final FMLCommonSetupEvent event) {
         CapabilityRegistry.initCapabilities();
+        OOPCPacketHandler.registerPackets();
     }
 
     @OnlyIn(Dist.CLIENT)
