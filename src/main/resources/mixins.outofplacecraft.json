@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "verbose": true,
+  "compatibilityLevel": "JAVA_8",
+  "package": "ink.echol.outofplacecraft.mixin",
+  "refmap": "mixins.outofplacecraft.refmap.json",
+  "minVersion": "0.7.3",
+  "client": [
+    "MixinAbstractClientPlayerEntity",
+    "MixinEntityRendererManager"
+  ],
+  "mixins": [
+    "MixinFirstPersonRenderer"
+  ]
+}

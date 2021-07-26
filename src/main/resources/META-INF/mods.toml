@@ -31,3 +31,10 @@ An Out Of Placers mod that allows you to play as a yinglet after being zatzinged
     versionRange="[1.16.5,1.17)"
     ordering="NONE"
     side="BOTH"
+
+[[dependencies.outofplacecraft]]
+    modId="geckolib3"
+    mandatory=true
+    versionRange="[3.0.41,)"
+    ordering="AFTER"
+    side="BOTH" #Change this to client? Unsure.

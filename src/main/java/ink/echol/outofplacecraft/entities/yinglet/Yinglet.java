@@ -56,7 +56,7 @@ public class Yinglet extends CreatureEntity implements IAnimatable {
 
 	public Yinglet(final EntityType<? extends CreatureEntity> type, final World world_in) {
 		super(type, world_in);
-		this.noCulling = true;
+		this.noCulling = false;
 	}
 
 	public static final EntityType<Yinglet> ENTITY_TYPE = EntityType.Builder
