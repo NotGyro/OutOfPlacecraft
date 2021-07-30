@@ -8,6 +8,8 @@ import ink.echol.outofplacecraft.capabilities.YingletStatus;
 import ink.echol.outofplacecraft.entities.yinglet.Yinglet;
 import ink.echol.outofplacecraft.net.OOPCPacketHandler;
 import ink.echol.outofplacecraft.net.YingletStatusPacket;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -26,6 +28,7 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = OutOfPlacecraftMod.MODID)
 public class EntityEventHandler {
     private static final long YING_STATUS_UPDATE_TICK_DELAY = 1024; // 51.2 seconds, just a pinch less than a minute.
+    private static final long PLAYER_DIMENSIONS_REFRESH_DELAY = 64;
 
     @SubscribeEvent
     public static void attachCapabilities(AttachCapabilitiesEvent<Entity> event) {
@@ -90,6 +93,10 @@ public class EntityEventHandler {
                 //It is the appointed time! Let's do this.
                 syncYingletStatusToClient(player, player);
             }
+        }
+
+        if( (player.level.getGameTime() % PLAYER_DIMENSIONS_REFRESH_DELAY ) == 0) {
+            player.refreshDimensions();
         }
     }
 

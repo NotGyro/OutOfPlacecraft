@@ -63,6 +63,8 @@ public class YingletStatusPacket {
 
             IYingletStatus cap = player.getCapability(CapabilityRegistry.YINGLET_CAPABILITY).orElseThrow(NullPointerException::new);
             cap.setIsYinglet(msg.value);
+            //Make sure hitbox & eye height are correct.
+            player.refreshDimensions();
         });
         ctx.get().setPacketHandled(true);
     }

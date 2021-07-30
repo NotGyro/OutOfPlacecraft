@@ -38,10 +38,4 @@ public class YingletRenderer extends GeoEntityRenderer<Yinglet> {
 									ResourceLocation textureLocation) {
 		return RenderType.entityCutout(getTextureLocation(animatable));
 	}
-
-	@Override
-	public void renderEarly(Yinglet animatable, MatrixStack stackIn, float ticks, IRenderTypeBuffer renderTypeBuffer, IVertexBuilder vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float partialTicks) {
-		stackIn.scale(5.0f, 5.0f, 5.0f);
-		super.renderEarly(animatable, stackIn, ticks, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, partialTicks);
-	}
 }

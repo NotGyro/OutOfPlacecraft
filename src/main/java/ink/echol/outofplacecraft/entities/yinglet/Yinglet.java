@@ -134,7 +134,7 @@ public class Yinglet extends CreatureEntity implements IAnimatable {
 	}
 
 	private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.yinglet.stand", true));
+		event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.yinglet.WHY", true));
 		return PlayState.CONTINUE;
 	}
 

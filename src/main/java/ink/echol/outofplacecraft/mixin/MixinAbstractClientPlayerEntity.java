@@ -1,6 +1,9 @@
 package ink.echol.outofplacecraft.mixin;
 
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.entity.Pose;
+import net.minecraft.util.Hand;
 import org.spongepowered.asm.mixin.Implements;
 import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,7 +24,39 @@ public abstract class MixinAbstractClientPlayerEntity {
     }
 
     protected <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.yinglet.stand", true));
+
+        Object obj = (Object) this;
+        AbstractClientPlayerEntity thisPlayer = ((AbstractClientPlayerEntity) obj);
+
+        Pose pose = thisPlayer.getPose();
+        if (thisPlayer.getForcedPose() != null ) {
+            pose = thisPlayer.getForcedPose();
+        }
+        AnimationBuilder ab = new AnimationBuilder();
+
+        float attack_anim_min = 0.01f;
+
+        if ( thisPlayer.attackAnim > attack_anim_min) {
+            if( thisPlayer.swingingArm == Hand.MAIN_HAND ) {
+                ab = ab.addAnimation("animation.yinglet.INTERACT_ATTACK_RIGHT", true);
+            }
+            else {
+                ab = ab.addAnimation("animation.yinglet.INTERACT_ATTACK_LEFT", true);
+            }
+        }
+
+        if(thisPlayer.isPassenger()) {
+            ab = ab.addAnimation("animation.yinglet.SITTING", true);
+        }
+        else {
+            if (thisPlayer.abilities.flying) {
+                ab = ab.addAnimation("animation.yinglet.FLY", true);
+            }
+            else {
+                ab = ab.addAnimation("animation.yinglet.STAND", true);
+            }
+        }
+        event.getController().setAnimation(ab);
         return PlayState.CONTINUE;
     }
     protected AnimationFactory animationFactory = new AnimationFactory((IAnimatable)  this);
@@ -29,4 +64,5 @@ public abstract class MixinAbstractClientPlayerEntity {
     public AnimationFactory oopc$getFactory() {
         return animationFactory;
     }
+
 }
