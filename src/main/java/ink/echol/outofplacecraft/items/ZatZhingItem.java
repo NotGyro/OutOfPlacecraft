@@ -7,6 +7,9 @@ import ink.echol.outofplacecraft.net.OOPCPacketHandler;
 import ink.echol.outofplacecraft.net.SpeciesPacket;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attribute;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.PotionEntity;
@@ -112,6 +115,15 @@ public class ZatZhingItem extends Item {
         }
     }
 
+    public static final float SCALE_HEALTH = -0.4f;
+
+    public static void applyMaxHealthEffect(PlayerEntity player) {
+        AttributeModifier modifier = new AttributeModifier("yinglet_health_reduce", SCALE_HEALTH, AttributeModifier.Operation.MULTIPLY_BASE);
+        if(!player.getAttribute(Attributes.MAX_HEALTH).hasModifier(modifier)) {
+            player.getAttribute(Attributes.MAX_HEALTH).addPermanentModifier(modifier);
+        }
+    }
+
     // Method for entering my magical realm. >:}
     // Returns true if we should consume the item - false if it didn't get used and won't be consumed.
     public static void applyZhingEffect(ItemStack stack, World world, PlayerEntity player) {
@@ -124,9 +136,11 @@ public class ZatZhingItem extends Item {
             System.out.println("Player has been zat zing'd: ");
             System.out.print(player.getScoreboardName());
 
+            applyMaxHealthEffect(player);
             // We are necessarily serverside. Send a packet.
             ISpecies targetCap = player.getCapability(CapabilityRegistry.SPECIES_CAPABILITY).orElseThrow(NullPointerException::new);
             UUID targetUUID = player.getGameProfile().getId();
+
             // Last argument on YingletStatusPacket's constructor true for "this is a transformation."
             SpeciesPacket pkt = new SpeciesPacket(targetUUID, SpeciesCapability.YINGLET_ID, true);
             OOPCPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), pkt);

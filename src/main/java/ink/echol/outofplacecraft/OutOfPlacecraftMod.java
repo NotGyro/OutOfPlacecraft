@@ -26,6 +26,7 @@ import ink.echol.outofplacecraft.entities.yinglet.YingletRenderer;
 import ink.echol.outofplacecraft.items.ItemRegistry;
 import ink.echol.outofplacecraft.config.ConfigHandler;
 import ink.echol.outofplacecraft.net.OOPCPacketHandler;
+import ink.echol.outofplacecraft.potion.PotionRegistry;
 import ink.echol.outofplacecraft.world.WorldEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -71,6 +72,7 @@ public class OutOfPlacecraftMod
         bus.addListener(WorldEvents::commonSetup);
         MinecraftForge.EVENT_BUS.addListener(WorldEvents::onBiomeLoad);
         ItemRegistry.ITEMS.register(bus);
+        PotionRegistry.EFFECTS.register(bus);
     }
 
     @SubscribeEvent
