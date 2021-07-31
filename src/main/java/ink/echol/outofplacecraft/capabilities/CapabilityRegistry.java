@@ -6,10 +6,10 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 
 public class CapabilityRegistry {
     /** A capability allowing you to check if a player is a yinglet or not. */
-    @CapabilityInject(IYingletStatus.class)
-    public static Capability<IYingletStatus> YINGLET_CAPABILITY = null;
+    @CapabilityInject(ISpecies.class)
+    public static Capability<ISpecies> SPECIES_CAPABILITY = null;
 
     public static void initCapabilities() {
-        CapabilityManager.INSTANCE.register(IYingletStatus.class, new YingletStatus.Storage(), YingletStatus.Implementation::new);
+        CapabilityManager.INSTANCE.register(ISpecies.class, new SpeciesCapability.Storage(), SpeciesCapability.Implementation::new);
     }
 }

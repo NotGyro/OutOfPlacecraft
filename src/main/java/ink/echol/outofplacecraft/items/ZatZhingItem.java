@@ -1,25 +1,22 @@
 package ink.echol.outofplacecraft.items;
 
 import ink.echol.outofplacecraft.capabilities.CapabilityRegistry;
-import ink.echol.outofplacecraft.capabilities.IYingletStatus;
-import ink.echol.outofplacecraft.capabilities.YingletStatus;
+import ink.echol.outofplacecraft.capabilities.ISpecies;
+import ink.echol.outofplacecraft.capabilities.SpeciesCapability;
 import ink.echol.outofplacecraft.net.OOPCPacketHandler;
-import ink.echol.outofplacecraft.net.YingletStatusPacket;
+import ink.echol.outofplacecraft.net.SpeciesPacket;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.PotionEntity;
 import net.minecraft.item.*;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.potion.PotionUtils;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 import java.util.UUID;
@@ -72,7 +69,7 @@ public class ZatZhingItem extends Item {
     }
 
     protected boolean canApplyOnSelf(World world, PlayerEntity player, Hand hand) {
-        IYingletStatus cap = player.getCapability(CapabilityRegistry.YINGLET_CAPABILITY).orElseThrow(NullPointerException::new);
+        ISpecies cap = player.getCapability(CapabilityRegistry.SPECIES_CAPABILITY).orElseThrow(NullPointerException::new);
         //If we're already yinged this does nothing.
         return !cap.isYinglet();
     }
@@ -116,18 +113,18 @@ public class ZatZhingItem extends Item {
     public static void applyZhingEffect(ItemStack stack, World world, PlayerEntity player) {
         // This will probably never be called client-side, but... better safe than sorry.
         if(!world.isClientSide) {
-            IYingletStatus cap = player.getCapability(CapabilityRegistry.YINGLET_CAPABILITY).orElseThrow(NullPointerException::new);
+            ISpecies cap = player.getCapability(CapabilityRegistry.SPECIES_CAPABILITY).orElseThrow(NullPointerException::new);
             // Oops.
-            cap.setIsYinglet(true);
+            cap.setSpecies(SpeciesCapability.YINGLET_ID);
             // TODO remove this before release.
             System.out.println("Player has been zat zing'd: ");
             System.out.print(player.getScoreboardName());
 
             // We are necessarily serverside. Send a packet.
-            IYingletStatus targetCap = player.getCapability(CapabilityRegistry.YINGLET_CAPABILITY).orElseThrow(NullPointerException::new);
+            ISpecies targetCap = player.getCapability(CapabilityRegistry.SPECIES_CAPABILITY).orElseThrow(NullPointerException::new);
             UUID targetUUID = player.getGameProfile().getId();
             // Last argument on YingletStatusPacket's constructor true for "this is a transformation."
-            YingletStatusPacket pkt = new YingletStatusPacket(targetUUID, targetCap.isYinglet(), true);
+            SpeciesPacket pkt = new SpeciesPacket(targetUUID, SpeciesCapability.YINGLET_ID, true);
             OOPCPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), pkt);
         }
     }
