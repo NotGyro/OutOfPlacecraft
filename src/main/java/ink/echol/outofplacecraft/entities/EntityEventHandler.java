@@ -23,9 +23,9 @@ public class EntityEventHandler {
     private static final long PLAYER_DIMENSIONS_REFRESH_DELAY = 64;
 
     public static final float YINGLET_EYE_HEIGHT_SCALE_STANDING = 0.71f;
-    public static final float YINGLET_EYE_HEIGHT_SCALE_CROUCHING = 0.5f;
-    public static final EntitySize YINGLET_SIZE_STANDING = new EntitySize(0.5f, 1.1f, false);
-    public static final EntitySize YINGLET_SIZE_CROUCH = new EntitySize(0.5f, 0.45f, false);
+    public static final float YINGLET_EYE_HEIGHT_SCALE_CROUCHING = 0.6f;
+    public static final EntitySize YINGLET_SIZE_STANDING = new EntitySize(0.5f, 1.25f, false);
+    public static final EntitySize YINGLET_SIZE_CROUCH = new EntitySize(0.5f, 0.8f, false);
 
 
     @SubscribeEvent

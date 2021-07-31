@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "outofplacecraft:clam"
+  },
+  "result": "outofplacecraft:cooked_clam",
+  "experience": 0.25,
+  "cookingtime": 160
+}

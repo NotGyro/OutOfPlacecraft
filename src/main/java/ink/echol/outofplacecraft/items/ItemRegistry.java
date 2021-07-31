@@ -16,9 +16,12 @@ public class ItemRegistry {
     );
     // ITEMS
     public static final RegistryObject<Item> CLAM = ITEMS.register("clam",
-            () -> new Item(new Item.Properties().tab(ItemGroup.TAB_FOOD))
+            () -> new Item(new Item.Properties().tab(ItemGroup.TAB_FOOD).stacksTo(16))
+    );
+    public static final RegistryObject<Item> COOKED_CLAM = ITEMS.register("cooked_clam",
+            () -> new Item(new Item.Properties().tab(ItemGroup.TAB_FOOD).food(new Food.Builder().nutrition(5).fast().saturationMod(0.7f).build()).stacksTo(16))
     );
     public static final RegistryObject<Item> ZAT_ZHING = ITEMS.register("zatzhing",
-            () -> new ZatZhingItem(new Item.Properties().tab(ItemGroup.TAB_MISC))
+            () -> new ZatZhingItem(new Item.Properties().tab(ItemGroup.TAB_MISC).stacksTo(1))
     );
 }

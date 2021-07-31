@@ -35,10 +35,10 @@ public class ZatZhingItem extends Item {
     // Is this player just eating the thing, or throwing it?
     protected boolean onSelf(World world, PlayerEntity player, Hand hand) {
         if( player.isCrouching() ) {
-            return true;
+            return false;
         }
         else {
-            return false;
+            return true;
         }
     }
 
@@ -79,9 +79,13 @@ public class ZatZhingItem extends Item {
         if( this.onSelf(world, player, hand) && this.canApplyOnSelf(world, player, hand) ) {
             return this.actionEatStart(world, player, hand);
         }
+        //Commenting this out until we have actual splash potion behavior going.
+        /*
         else {
             return this.actionThrow(world, player, hand);
-        }
+        }*/
+
+        return super.use(world, player, hand);
     }
 
    //What happens at the end of the eating/drinking anim.

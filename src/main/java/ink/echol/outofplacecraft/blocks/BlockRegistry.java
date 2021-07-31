@@ -14,7 +14,7 @@ public class BlockRegistry {
 
     public static final RegistryObject<Block> CLAMSAND_BLOCK = BLOCKS.register("clam_sand", ()
             -> new FallingBlock(AbstractBlock.Properties.of(Material.SAND, MaterialColor.COLOR_LIGHT_GRAY)
-            .harvestLevel(0)
+            .harvestLevel(1)
             .harvestTool(ToolType.SHOVEL)
             .strength(1.0F, 1.0F)
             .sound(SoundType.SAND)));
