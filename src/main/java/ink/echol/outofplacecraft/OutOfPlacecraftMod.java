@@ -31,6 +31,7 @@ import ink.echol.outofplacecraft.world.WorldEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -73,6 +74,8 @@ public class OutOfPlacecraftMod
         MinecraftForge.EVENT_BUS.addListener(WorldEvents::onBiomeLoad);
         ItemRegistry.ITEMS.register(bus);
         PotionRegistry.EFFECTS.register(bus);
+
+        MinecraftForge.EVENT_BUS.addListener(OutOfPlacecraftMod::registerComamnds);
     }
 
     @SubscribeEvent
@@ -85,5 +88,9 @@ public class OutOfPlacecraftMod
     @SubscribeEvent
     public static void registerRenderers(final FMLClientSetupEvent event) {
         RenderingRegistry.registerEntityRenderingHandler(Yinglet.ENTITY_TYPE, YingletRenderer::new);
+    }
+
+    public static void registerComamnds(RegisterCommandsEvent event) {
+        SetSpeciesCommand.register(event.getDispatcher());
     }
 }

@@ -17,7 +17,7 @@ public class SpeciesCapability {
     public static final ResourceLocation ident = new ResourceLocation(OutOfPlacecraftMod.MODID,"species");
 
     public static final int HUMAN_ID = ("human").hashCode();
-    public static final int YINGLET_ID = ("outofplacecraft:yinglet").hashCode();
+    public static final int YINGLET_ID = ("yinglet").hashCode();
 
     public static class Implementation implements ISpecies {
         public Implementation() {}

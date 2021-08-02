@@ -43,7 +43,7 @@ public class WorldEvents {
                             ImmutableList.of(Blocks.SAND.defaultBlockState()), //In
                             ImmutableList.of(Blocks.AIR.defaultBlockState(), Blocks.WATER.defaultBlockState(), Blocks.SUGAR_CANE.defaultBlockState()) //Under
                     )
-            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(31, 0, 30))).squared().count(18);
+            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(31, 0, 30))).squared().count(16);
 
             //------ ARTIFACT SAND ------
             CONFIGURED_ARTIFACT_SAND = Feature.SIMPLE_BLOCK.configured(new BlockWithContextConfig(BlockRegistry.ARTIFACT_SAND_BLOCK.get().defaultBlockState(),

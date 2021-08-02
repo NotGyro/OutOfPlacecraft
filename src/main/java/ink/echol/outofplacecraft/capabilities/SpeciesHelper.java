@@ -25,10 +25,10 @@ public class SpeciesHelper {
                 .orElse(new SpeciesCapability.Implementation(SpeciesCapability.HUMAN_ID));
         // Special cases for Dragon Survival and such (vampires?) will go here.
 
+        cap.setSpecies(speciesId);
+
         // Make sure eye-height and hitbox are updated correctly.
         player.refreshDimensions();
-
-        cap.setSpecies(speciesId);
 
         return true;
     }
@@ -42,7 +42,7 @@ public class SpeciesHelper {
             ISpecies targetCap = target.getCapability(CapabilityRegistry.SPECIES_CAPABILITY, null).orElseThrow(NullPointerException::new);
             UUID targetUUID = target.getGameProfile().getId();
             SpeciesPacket pkt = new SpeciesPacket(targetUUID, targetCap.getSpecies(), newTF);
-            OOPCPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) target), pkt);
+            OOPCPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), pkt);
         }
     }
 }
