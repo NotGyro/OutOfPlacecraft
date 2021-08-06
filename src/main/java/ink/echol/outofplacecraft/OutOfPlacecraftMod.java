@@ -26,12 +26,14 @@ import ink.echol.outofplacecraft.entities.yinglet.YingletRenderer;
 import ink.echol.outofplacecraft.items.ItemRegistry;
 import ink.echol.outofplacecraft.config.ConfigHandler;
 import ink.echol.outofplacecraft.net.OOPCPacketHandler;
+import ink.echol.outofplacecraft.net.YingletSkinManager;
 import ink.echol.outofplacecraft.potion.PotionRegistry;
 import ink.echol.outofplacecraft.world.WorldEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -76,6 +78,7 @@ public class OutOfPlacecraftMod
         PotionRegistry.EFFECTS.register(bus);
 
         MinecraftForge.EVENT_BUS.addListener(OutOfPlacecraftMod::registerComamnds);
+        MinecraftForge.EVENT_BUS.addListener(OutOfPlacecraftMod::doSkinDownload);
     }
 
     @SubscribeEvent
@@ -91,6 +94,10 @@ public class OutOfPlacecraftMod
     }
 
     public static void registerComamnds(RegisterCommandsEvent event) {
-        SetSpeciesCommand.register(event.getDispatcher());
+        OOPCCommands.register(event.getDispatcher());
+    }
+
+    public static void doSkinDownload(TickEvent.ClientTickEvent event) {
+        YingletSkinManager.pollRequests();
     }
 }

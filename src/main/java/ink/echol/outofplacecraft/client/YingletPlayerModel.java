@@ -48,6 +48,7 @@ public class YingletPlayerModel extends AnimatedGeoModel {
 	public void setLivingAnimations(IAnimatable entity, Integer uniqueID, AnimationEvent customPredicate) {
 		super.setLivingAnimations(entity, uniqueID, customPredicate);
 
+		// Handle head rotation.
 		if(entity instanceof PlayerEntity) {
 			IBone head = this.getAnimationProcessor().getBone("head_bone");
 			PlayerEntity player = (PlayerEntity) entity;
