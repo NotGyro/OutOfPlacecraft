@@ -81,7 +81,7 @@ public class OOPCCommands {
         try {
             PlayerEntity player = source.getPlayerOrException();
             UUID uuid = player.getUUID();
-            YingletSkinManager.queueDownloadSkin(url, uuid);
+            YingletSkinManager.syncSkinServerSide(uuid, url);
             return 1;
         } catch (CommandSyntaxException e) {
             e.printStackTrace();

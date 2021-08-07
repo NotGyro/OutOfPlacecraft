@@ -59,8 +59,19 @@ public class OutOfPlacecraftMod
     public static boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
             getInputArguments().toString().indexOf("-agentlib:jdwp") > 0;
 
+
+    protected static class SaveSkinsOnQuit extends Thread {
+        public void run() {
+            YingletSkinManager.writeIndex();
+        }
+    }
+
     public OutOfPlacecraftMod() {
+        YingletSkinManager.loadIndexOnLaunch();
+        Runtime.getRuntime().addShutdownHook(new SaveSkinsOnQuit());
+
         GeckoLib.initialize();
+
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ConfigHandler.CLIENT_SPEC);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigHandler.COMMON_SPEC);
@@ -78,7 +89,6 @@ public class OutOfPlacecraftMod
         PotionRegistry.EFFECTS.register(bus);
 
         MinecraftForge.EVENT_BUS.addListener(OutOfPlacecraftMod::registerComamnds);
-        MinecraftForge.EVENT_BUS.addListener(OutOfPlacecraftMod::doSkinDownload);
     }
 
     @SubscribeEvent
@@ -95,9 +105,5 @@ public class OutOfPlacecraftMod
 
     public static void registerComamnds(RegisterCommandsEvent event) {
         OOPCCommands.register(event.getDispatcher());
-    }
-
-    public static void doSkinDownload(TickEvent.ClientTickEvent event) {
-        YingletSkinManager.pollRequests();
     }
 }

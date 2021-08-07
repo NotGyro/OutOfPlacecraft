@@ -20,6 +20,7 @@
 package ink.echol.outofplacecraft.client;
 
 import ink.echol.outofplacecraft.OutOfPlacecraftMod;
+import ink.echol.outofplacecraft.net.YingletSkinManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -27,6 +28,10 @@ import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.processor.IBone;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
+
+import java.util.UUID;
+
+import static ink.echol.outofplacecraft.client.SkinTextureLoader.SKIN_RESOURCE_PACK;
 
 public class YingletPlayerModel extends AnimatedGeoModel {
 	@Override
@@ -36,6 +41,13 @@ public class YingletPlayerModel extends AnimatedGeoModel {
 
 	@Override
 	public ResourceLocation getTextureLocation(Object entity) {
+		if( entity instanceof PlayerEntity) {
+			PlayerEntity player = (PlayerEntity) entity;
+			UUID id = player.getUUID();
+			if(YingletSkinManager.skinIndex.containsKey(id)) {
+				return SkinTextureLoader.ensureLoaded(id);
+			}
+		}
 		return new ResourceLocation(OutOfPlacecraftMod.MODID, "textures/yinglet/default.png");
 	}
 

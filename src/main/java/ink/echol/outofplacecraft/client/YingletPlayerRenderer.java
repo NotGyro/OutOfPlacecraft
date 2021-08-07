@@ -42,4 +42,5 @@ public class YingletPlayerRenderer extends GeoEntityRenderer {
         stackIn.scale(5.0f, 5.0f, 5.0f);
         super.renderEarly((LivingEntity) animatable, stackIn, ticks, renderTypeBuffer, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, partialTicks);
     }*/
+
 }
