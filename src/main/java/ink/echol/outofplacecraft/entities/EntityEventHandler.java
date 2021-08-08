@@ -7,7 +7,6 @@ import ink.echol.outofplacecraft.capabilities.SpeciesCapability;
 import ink.echol.outofplacecraft.capabilities.SpeciesHelper;
 import ink.echol.outofplacecraft.items.ZatZhingItem;
 import ink.echol.outofplacecraft.net.OOPCPacketHandler;
-import ink.echol.outofplacecraft.net.SyncAllSkinsPkt;
 import ink.echol.outofplacecraft.net.SyncSkinPkt;
 import ink.echol.outofplacecraft.net.YingletSkinManager;
 import ink.echol.outofplacecraft.potion.PotionRegistry;
@@ -29,10 +28,10 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
+import org.apache.logging.log4j.Level;
 
 import java.util.Collection;
 import java.util.UUID;
-import java.util.Vector;
 
 
 @Mod.EventBusSubscriber(modid = OutOfPlacecraftMod.MODID)
@@ -204,8 +203,8 @@ public class EntityEventHandler {
 
                 //Handle skin stuff.
                 UUID targetUUID = target.getUUID();
-                if(YingletSkinManager.skinIndex.containsKey(targetUUID)){
-                    YingletSkinManager.SkinEntry entry = YingletSkinManager.skinIndex.get(targetUUID);
+                if(YingletSkinManager.getServer().skinIndex.containsKey(targetUUID)){
+                    YingletSkinManager.SkinEntry entry = YingletSkinManager.getServer().skinIndex.get(targetUUID);
                     if(entry != null) {
                         SyncSkinPkt pkt = new SyncSkinPkt(targetUUID, entry.url, entry.hash);
                         OOPCPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) sendTo), pkt);
@@ -225,8 +224,7 @@ public class EntityEventHandler {
             SpeciesHelper.syncSpeciesToClient(player, player);
 
             //Handle skin stuff.
-            SyncAllSkinsPkt pkt = new SyncAllSkinsPkt(YingletSkinManager.stringifyIndex());
-            OOPCPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), pkt);
+            YingletSkinManager.getServer().syncAllSkinsTo(player);
         }
     }
 
@@ -248,10 +246,9 @@ public class EntityEventHandler {
                 //It is the appointed time! Let's do this.
                 SpeciesHelper.syncSpeciesToClient(player, player);
             }
-            if( (((ServerPlayerEntity) player).getLevel().getGameTime() % 4096 ) == 0) {
+            if( (((ServerPlayerEntity) player).getLevel().getGameTime() % 512 ) == 0) {
                 //Handle skin stuff.
-                SyncAllSkinsPkt pkt = new SyncAllSkinsPkt(YingletSkinManager.stringifyIndex());
-                OOPCPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), pkt);
+                YingletSkinManager.getServer().syncAllSkinsTo(player);
             }
         }
 

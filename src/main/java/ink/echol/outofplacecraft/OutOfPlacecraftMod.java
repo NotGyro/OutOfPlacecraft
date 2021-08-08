@@ -42,6 +42,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -59,20 +61,8 @@ public class OutOfPlacecraftMod
     public static boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
             getInputArguments().toString().indexOf("-agentlib:jdwp") > 0;
 
-
-    protected static class SaveSkinsOnQuit extends Thread {
-        public void run() {
-            YingletSkinManager.writeIndex();
-        }
-    }
-
     public OutOfPlacecraftMod() {
-        YingletSkinManager.loadIndexOnLaunch();
-        Runtime.getRuntime().addShutdownHook(new SaveSkinsOnQuit());
-
         GeckoLib.initialize();
-
-
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ConfigHandler.CLIENT_SPEC);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigHandler.COMMON_SPEC);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, ConfigHandler.SERVER_SPEC);
@@ -89,12 +79,20 @@ public class OutOfPlacecraftMod
         PotionRegistry.EFFECTS.register(bus);
 
         MinecraftForge.EVENT_BUS.addListener(OutOfPlacecraftMod::registerComamnds);
+        MinecraftForge.EVENT_BUS.addListener(OutOfPlacecraftMod::onServerStop);
     }
 
     @SubscribeEvent
     static void commonSetup(final FMLCommonSetupEvent event) {
         CapabilityRegistry.initCapabilities();
         OOPCPacketHandler.registerPackets();
+        YingletSkinManager.initServer();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
+    static void clientSetup(final FMLClientSetupEvent event) {
+        YingletSkinManager.initClient();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -105,5 +103,9 @@ public class OutOfPlacecraftMod
 
     public static void registerComamnds(RegisterCommandsEvent event) {
         OOPCCommands.register(event.getDispatcher());
+    }
+
+    public static void onServerStop(FMLServerStoppingEvent event) {
+        YingletSkinManager.onExit();
     }
 }

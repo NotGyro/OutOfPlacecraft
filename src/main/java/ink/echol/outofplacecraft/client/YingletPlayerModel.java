@@ -44,7 +44,7 @@ public class YingletPlayerModel extends AnimatedGeoModel {
 		if( entity instanceof PlayerEntity) {
 			PlayerEntity player = (PlayerEntity) entity;
 			UUID id = player.getUUID();
-			if(YingletSkinManager.skinIndex.containsKey(id)) {
+			if(YingletSkinManager.getClient().skinIndex.containsKey(id)) {
 				return SkinTextureLoader.ensureLoaded(id);
 			}
 		}

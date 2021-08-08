@@ -1,5 +1,6 @@
 package ink.echol.outofplacecraft.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import ink.echol.outofplacecraft.OutOfPlacecraftMod;
 import ink.echol.outofplacecraft.net.YingletSkinManager;
 import net.minecraft.client.Minecraft;
@@ -21,6 +22,8 @@ import java.util.UUID;
 public class SkinTextureLoader {
     public static final String SKIN_RESOURCE_PACK = OutOfPlacecraftMod.MODID;
 
+    public static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation(OutOfPlacecraftMod.MODID, "textures/yinglet/default.png");
+
     public static class LoadedTextureEntry {
         public final ResourceLocation location;
         public final DynamicTexture texture;
@@ -37,10 +40,21 @@ public class SkinTextureLoader {
     // Reload the texture for a playerr if the player's skin changes
     public static void reloadTexture(UUID playerId) {
         if( loadedCurrent.containsKey(playerId)  ) {
-
-            Minecraft.getInstance().textureManager.release(loadedCurrent.get(playerId).location);
             loadedCurrent.remove(playerId);
-            setupTextureFor(playerId);
+            // ONLY DO THIS if we're actually in a game.
+            if (!RenderSystem.isOnRenderThread()) {
+                RenderSystem.recordRenderCall(() -> {
+                    Minecraft.getInstance().textureManager.release(loadedCurrent.get(playerId).location);
+                    setupTextureFor(playerId);
+                });
+            } else {
+                Minecraft.getInstance().textureManager.release(loadedCurrent.get(playerId).location);
+                loadedCurrent.remove(playerId);
+                setupTextureFor(playerId);
+            }
+        }
+        else {
+            ensureLoaded(playerId);
         }
     }
 
@@ -50,12 +64,18 @@ public class SkinTextureLoader {
     }
 
     public static ResourceLocation setupTextureFor(UUID id) {
-        if(YingletSkinManager.skinIndex.containsKey(id)) {
-            YingletSkinManager.SkinEntry entry = YingletSkinManager.skinIndex.get(id);
+        if(YingletSkinManager.getClient().skinIndex.containsKey(id)) {
+            YingletSkinManager.SkinEntry entry = YingletSkinManager.getClient().skinIndex.get(id);
             ResourceLocation resourceId = new ResourceLocation(SKIN_RESOURCE_PACK, id.toString().toLowerCase());
             try {
+                Path path = Paths.get(YingletSkinManager.SKIN_FOLDER + entry.file);
+                if(!Files.exists(path) ) {
+                    //Just in case it's registered but not downloaded yet.
+                    YingletSkinManager.getClient().queueDownloadSkin(entry.url, id);
+                    return DEFAULT_TEXTURE;
+                }
                 // Load our file
-                InputStream imageData = loadTextureFromFile(Paths.get(YingletSkinManager.SKIN_FOLDER + entry.file));
+                InputStream imageData = loadTextureFromFile(path);
                 NativeImage image = NativeImage.read(NativeImage.PixelFormat.RGBA, imageData);
                 // Create an image from it
                 DynamicTexture tex = new DynamicTexture(image);
@@ -71,11 +91,11 @@ public class SkinTextureLoader {
                 e.printStackTrace();
             }
         }
-        return new ResourceLocation(OutOfPlacecraftMod.MODID, "textures/yinglet/default.png");
+        return DEFAULT_TEXTURE;
     }
 
     public static ResourceLocation ensureLoaded(UUID id) {
-        if(YingletSkinManager.skinIndex.containsKey(id)) {
+        if(YingletSkinManager.getClient().skinIndex.containsKey(id)) {
             // There SHOULD be a texture for this user (per skinIndex containing a key for this uuid), but there isn't yet:
             // Therefore, we need to load one.
             if( !loadedCurrent.containsKey(id)) {
@@ -86,7 +106,7 @@ public class SkinTextureLoader {
             }
         }
         else {
-            return new ResourceLocation(OutOfPlacecraftMod.MODID, "textures/yinglet/default.png");
+            return DEFAULT_TEXTURE;
         }
     }
 }

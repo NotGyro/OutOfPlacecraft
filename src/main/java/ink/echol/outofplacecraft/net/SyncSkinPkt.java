@@ -40,7 +40,7 @@ public class SyncSkinPkt {
     public static void handle(SyncSkinPkt msg, Supplier<NetworkEvent.Context> ctx) {
         if(ctx.get() != null) {
             ctx.get().enqueueWork(() -> {
-                YingletSkinManager.clientSyncIncomingSkin(msg.playerId, msg.url, msg.hash);
+                YingletSkinManager.getClient().clientSyncIncomingSkin(msg.playerId, msg.url, msg.hash);
             });
             ctx.get().setPacketHandled(true);
         }
