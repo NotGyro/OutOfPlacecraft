@@ -378,4 +378,18 @@ public class YingletSkinManager {
             e.printStackTrace();
         }
     }
+
+    public void deleteSkin(UUID id) {
+        if(this.skinIndex.containsKey(id)) {
+            SkinEntry entry = this.skinIndex.get(id);
+            String file = SKIN_FOLDER + entry.file;
+            Path filepath = Paths.get(file);
+            try {
+                Files.deleteIfExists(filepath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            this.skinIndex.remove(id);
+        }
+    }
 }

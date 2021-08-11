@@ -4,6 +4,8 @@ import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.entity.Pose;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import org.spongepowered.asm.mixin.Implements;
 import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,34 +30,106 @@ public abstract class MixinAbstractClientPlayerEntity {
         Object obj = (Object) this;
         AbstractClientPlayerEntity thisPlayer = ((AbstractClientPlayerEntity) obj);
 
+        AnimationBuilder ab = new AnimationBuilder();
+
+        boolean idle = true;
+
+        //None of the above animation is playing. Default to stand.
         Pose pose = thisPlayer.getPose();
         if (thisPlayer.getForcedPose() != null ) {
             pose = thisPlayer.getForcedPose();
         }
-        AnimationBuilder ab = new AnimationBuilder();
+
+        boolean isCrouching = pose == Pose.CROUCHING;
+
+
+        Vector3d playerDelta = thisPlayer.getDeltaMovement();
+        Vector3d newDelta = new Vector3d(playerDelta.x, 0.0d, playerDelta.y);
+
+        float f = (float)newDelta.lengthSqr();
+
+        // Constant to normalize this thing.
+        if(isCrouching) {
+            //Crouching needs a lower threshold.
+            f = f + 0.993f;
+        }
+        else {
+            f = f + 0.99f;
+        }
+
+        //Make sure its at least 1 for later when we adjust animation speed based on this variable.
+        if (f < 1.0F) {
+            f = 1.0F;
+        }
+
+        float fallAmount = (float) playerDelta.y();
+        boolean fallingFlag = (fallAmount + 0.9f) < 0.0f; //thisPlayer.getFallFlyingTicks() > 4;
+
+        // Sit
+        if(thisPlayer.isPassenger()) {
+            ab = ab.addAnimation("animation.yinglet.SITTING", true);
+            idle = false;
+        }
+        else {
+            if (thisPlayer.abilities.flying) {
+                ab = ab.addAnimation("animation.yinglet.FLY", true);
+                idle = false;
+            }
+            else if(fallingFlag) {
+                ab = ab.addAnimation("animation.yinglet.FALLING", true);
+                idle = false;
+            }
+            // Walking or running
+            else if(f > 1.0f) {
+                if(isCrouching) {
+                    // No crouch running yet.
+                    ab = ab.addAnimation("animation.yinglet.CROUCH_WALK", true);
+                    idle = false;
+                }
+                else {
+                    //Not crouching
+                    if(f > 1.011f) {
+                        //Running
+                        ab = ab.addAnimation("animation.yinglet.RUNNING", true);
+                        idle = false;
+
+                    }
+                    else {
+                        //Walking
+                        ab = ab.addAnimation("animation.yinglet.WALK", true);
+                        idle = false;
+                    }
+                }
+            }
+        }
+
+        if(pose == Pose.SLEEPING) {
+            ab = ab.addAnimation("animation.yinglet.SLEEPING", true);
+            idle = false;
+        }
 
         float attack_anim_min = 0.01f;
 
         if ( thisPlayer.attackAnim > attack_anim_min) {
             if( thisPlayer.swingingArm == Hand.MAIN_HAND ) {
                 ab = ab.addAnimation("animation.yinglet.INTERACT_ATTACK_RIGHT", true);
+                idle = false;
             }
             else {
                 ab = ab.addAnimation("animation.yinglet.INTERACT_ATTACK_LEFT", true);
+                idle = false;
             }
         }
 
-        if(thisPlayer.isPassenger()) {
-            ab = ab.addAnimation("animation.yinglet.SITTING", true);
-        }
-        else {
-            if (thisPlayer.abilities.flying) {
-                ab = ab.addAnimation("animation.yinglet.FLY", true);
-            }
-            else {
+        //None of the above animations was selected, do the regular standing animation.
+        if(idle) {
+            if(isCrouching) {
+                ab = ab.addAnimation("animation.yinglet.CROUCH_IDLE", true);
+            } else {
                 ab = ab.addAnimation("animation.yinglet.STAND", true);
             }
         }
+
         event.getController().setAnimation(ab);
         return PlayState.CONTINUE;
     }

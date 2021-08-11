@@ -1,11 +1,21 @@
 package ink.echol.outofplacecraft.mixin;
 
+import com.google.common.base.MoreObjects;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import ink.echol.outofplacecraft.capabilities.CapabilityRegistry;
 import ink.echol.outofplacecraft.capabilities.ISpecies;
+import ink.echol.outofplacecraft.client.YingletPlayerModel;
+import ink.echol.outofplacecraft.entities.yinglet.YingletModel;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.renderer.FirstPersonRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.item.CrossbowItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.common.util.LazyOptional;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,7 +30,8 @@ public class MixinFirstPersonRenderer {
         if(capOpt.isPresent()) {
             ISpecies cap = capOpt.orElseThrow(NullPointerException::new);
             if(cap.isYinglet()) {
-                //TODO: draw creature hands
+                Object obj = this;
+                FirstPersonRenderer renderObj = (FirstPersonRenderer) obj;
                 callback.cancel();
             }
         }

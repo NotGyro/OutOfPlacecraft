@@ -40,11 +40,11 @@ public class SkinTextureLoader {
     // Reload the texture for a playerr if the player's skin changes
     public static void reloadTexture(UUID playerId) {
         if( loadedCurrent.containsKey(playerId)  ) {
-            loadedCurrent.remove(playerId);
             // ONLY DO THIS if we're actually in a game.
             if (!RenderSystem.isOnRenderThread()) {
                 RenderSystem.recordRenderCall(() -> {
                     Minecraft.getInstance().textureManager.release(loadedCurrent.get(playerId).location);
+                    loadedCurrent.remove(playerId);
                     setupTextureFor(playerId);
                 });
             } else {
@@ -64,31 +64,37 @@ public class SkinTextureLoader {
     }
 
     public static ResourceLocation setupTextureFor(UUID id) {
-        if(YingletSkinManager.getClient().skinIndex.containsKey(id)) {
-            YingletSkinManager.SkinEntry entry = YingletSkinManager.getClient().skinIndex.get(id);
-            ResourceLocation resourceId = new ResourceLocation(SKIN_RESOURCE_PACK, id.toString().toLowerCase());
-            try {
-                Path path = Paths.get(YingletSkinManager.SKIN_FOLDER + entry.file);
-                if(!Files.exists(path) ) {
-                    //Just in case it's registered but not downloaded yet.
-                    YingletSkinManager.getClient().queueDownloadSkin(entry.url, id);
-                    return DEFAULT_TEXTURE;
+        if( Minecraft.getInstance() != null) {
+            if (Minecraft.getInstance().textureManager != null){
+                if (YingletSkinManager.getClient().skinIndex.containsKey(id)) {
+                    YingletSkinManager.SkinEntry entry = YingletSkinManager.getClient().skinIndex.get(id);
+                    ResourceLocation resourceId = new ResourceLocation(SKIN_RESOURCE_PACK, id.toString().toLowerCase());
+                    try {
+                        Path path = Paths.get(YingletSkinManager.SKIN_FOLDER + entry.file);
+                        if (!Files.exists(path)) {
+                            //Just in case it's registered but not downloaded yet.
+                            YingletSkinManager.getClient().queueDownloadSkin(entry.url, id);
+                            return DEFAULT_TEXTURE;
+                        }
+                        // Load our file
+                        InputStream imageData = loadTextureFromFile(path);
+                        NativeImage image = NativeImage.read(NativeImage.PixelFormat.RGBA, imageData);
+                        // Create an image from it
+                        DynamicTexture tex = new DynamicTexture(image);
+                        tex.upload();
+
+                        // Give it to our texture manager.
+                        // This is a method overload that does something clever with dynamic textures!
+                        ResourceLocation loc = Minecraft.getInstance().textureManager.register("ying/" + id.toString(), tex);
+
+                        loadedCurrent.put(id, new LoadedTextureEntry(loc, tex));
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        //Make sure it doesn't spam this message perpetually, by removing the old skin.
+                        YingletSkinManager.getClient().deleteSkin(id);
+                    }
                 }
-                // Load our file
-                InputStream imageData = loadTextureFromFile(path);
-                NativeImage image = NativeImage.read(NativeImage.PixelFormat.RGBA, imageData);
-                // Create an image from it
-                DynamicTexture tex = new DynamicTexture(image);
-                tex.upload();
-
-                // Give it to our texture manager.
-                // This is a method overload that does something clever with dynamic textures!
-                ResourceLocation loc = Minecraft.getInstance().textureManager.register("ying/"+id.toString(), tex);
-
-                loadedCurrent.put(id, new LoadedTextureEntry(loc, tex));
-
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
         return DEFAULT_TEXTURE;
