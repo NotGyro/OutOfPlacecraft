@@ -71,11 +71,11 @@ public class YingletPlayerModel extends AnimatedGeoModel {
 			float f1 = MathHelper.rotLerp(tickTime, player.yHeadRotO, player.yHeadRot);
 			float angle = f1 - f;
 			float rad_angle = (float) -((angle) * (Math.PI/180));
-			head.setRotationY(rad_angle);
+			head.setRotationY(rad_angle + head.getRotationY());
 
 			float angleX = MathHelper.lerp(tickTime, player.xRotO, player.xRot);
 			float rad_angleX = (float) -((angleX) * (Math.PI/180));
-			head.setRotationX(rad_angleX);
+			head.setRotationX(rad_angleX + head.getRotationX());
 		}
 	}
 }

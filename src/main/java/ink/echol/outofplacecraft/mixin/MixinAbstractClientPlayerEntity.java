@@ -43,27 +43,13 @@ public abstract class MixinAbstractClientPlayerEntity {
         boolean isCrouching = pose == Pose.CROUCHING;
 
 
-        Vector3d playerDelta = thisPlayer.getDeltaMovement();
-        Vector3d newDelta = new Vector3d(playerDelta.x, 0.0d, playerDelta.y);
+        //Vector3d  = thisPlayer.getDeltaMovement();
+        Vector3d playerDelta = new Vector3d(thisPlayer.getX() - thisPlayer.xo, thisPlayer.getY() - thisPlayer.yo, thisPlayer.getZ() - thisPlayer.zo);
 
-        float f = (float)newDelta.lengthSqr();
-
-        // Constant to normalize this thing.
-        if(isCrouching) {
-            //Crouching needs a lower threshold.
-            f = f + 0.993f;
-        }
-        else {
-            f = f + 0.99f;
-        }
-
-        //Make sure its at least 1 for later when we adjust animation speed based on this variable.
-        if (f < 1.0F) {
-            f = 1.0F;
-        }
+        boolean isWalkingOrRunning = Math.sqrt(Math.pow(playerDelta.x, 2) + Math.pow(playerDelta.z, 2)) > 0.005;
 
         float fallAmount = (float) playerDelta.y();
-        boolean fallingFlag = (fallAmount + 0.9f) < 0.0f; //thisPlayer.getFallFlyingTicks() > 4;
+        boolean fallingFlag = (fallAmount + 0.5f) < 0.0f; //thisPlayer.getFallFlyingTicks() > 4;
 
         // Sit
         if(thisPlayer.isPassenger()) {
@@ -71,8 +57,12 @@ public abstract class MixinAbstractClientPlayerEntity {
             idle = false;
         }
         else {
-            if (thisPlayer.abilities.flying) {
+            if (thisPlayer.abilities.flying && !thisPlayer.isOnGround() && !thisPlayer.isInWater() && !thisPlayer.isInLava() ) {
                 ab = ab.addAnimation("animation.yinglet.FLY", true);
+                idle = false;
+            }
+            else if(!thisPlayer.isOnGround() && thisPlayer.isInWater()) {
+                ab = ab.addAnimation("animation.yinglet.SWIMMING", true);
                 idle = false;
             }
             else if(fallingFlag) {
@@ -80,21 +70,22 @@ public abstract class MixinAbstractClientPlayerEntity {
                 idle = false;
             }
             // Walking or running
-            else if(f > 1.0f) {
-                if(isCrouching) {
+            else if(isWalkingOrRunning) {
+                if(isCrouching && thisPlayer.animationSpeed != 0.0f) {
                     // No crouch running yet.
                     ab = ab.addAnimation("animation.yinglet.CROUCH_WALK", true);
                     idle = false;
                 }
                 else {
                     //Not crouching
-                    if(f > 1.011f) {
+                    //But we ARE sprinting.
+                    if(thisPlayer.isSprinting()) {
                         //Running
                         ab = ab.addAnimation("animation.yinglet.RUNNING", true);
                         idle = false;
 
                     }
-                    else {
+                    else if (thisPlayer.animationSpeed != 0.0f) {
                         //Walking
                         ab = ab.addAnimation("animation.yinglet.WALK", true);
                         idle = false;
