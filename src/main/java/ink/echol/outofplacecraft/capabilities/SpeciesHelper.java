@@ -26,6 +26,12 @@ public class SpeciesHelper {
         // Special cases for Dragon Survival and such (vampires?) will go here.
 
         cap.setSpecies(speciesId);
+        // We are necessarily serverside. Send a packet.
+        UUID targetUUID = player.getGameProfile().getId();
+
+        // Last argument on YingletStatusPacket's constructor true for "this is a transformation."
+        SpeciesPacket pkt = new SpeciesPacket(targetUUID, speciesId, true);
+        OOPCPacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), pkt);
 
         // Make sure eye-height and hitbox are updated correctly.
         player.refreshDimensions();

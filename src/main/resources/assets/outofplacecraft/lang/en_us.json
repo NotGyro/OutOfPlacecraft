@@ -1,0 +1,10 @@
+{
+  "_comment": "Out Of Placecraft english-language localization (default)",
+  "chat.outofplacecraft.yingletTransformation": "A cold burning sensation spreads through your body.\nYour bones twist and pop as your body changes.\nYou have become a yinglet.",
+  "chat.outofplacecraft.yingletVomitBread": "You can't digest bread! You vomit.",
+  "block.outofplacecraft.clam_sand": "Clam-bearing sand",
+  "block.outofplacecraft.artifact_sand": "Artifact-bearing sand",
+  "item.outofplacecraft.zatzhing": "Mysterious crystal",
+  "item.outofplacecraft.clam": "Clam",
+  "item.outofplacecraft.cooked_clam": "Cooked clam"
+}

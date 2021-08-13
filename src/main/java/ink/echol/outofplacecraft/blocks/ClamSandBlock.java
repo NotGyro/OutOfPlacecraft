@@ -19,9 +19,9 @@ import net.minecraft.world.server.ServerWorld;
 import java.util.Random;
 
 public class ClamSandBlock extends FallingBlock {
-    protected static final int SPREAD_RADIUS = 8;
-    protected static final int TOO_CLOSE = 4;
-    protected static final int TOO_CLOSE_INNER = 3;
+    protected static final int SPREAD_RADIUS = 16;
+    protected static final int TOO_CLOSE = 8;
+    protected static final int TOO_CLOSE_INNER = 5;
     protected static final int WATER_SEARCH_DIST = 3;
     public ClamSandBlock(Properties p_i48401_1_) {
         super(p_i48401_1_);
@@ -30,6 +30,8 @@ public class ClamSandBlock extends FallingBlock {
     @Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         super.randomTick(state, world, pos, random);
+
+        //Do spread behavior
         int x = 0;
         int z = 0;
         while( (x < TOO_CLOSE) && (x > -TOO_CLOSE) ) {
@@ -83,24 +85,28 @@ public class ClamSandBlock extends FallingBlock {
                         if(surround.getBlock() == Blocks.WATER) {
                             water = true;
                         }
-                        else if(surround.getBlock() == BlockRegistry.CLAM_SAND_BLOCK.get()) {
-                            if((ix < TOO_CLOSE_INNER) && (ix > -TOO_CLOSE_INNER)) {
-                                if((iz < TOO_CLOSE_INNER) && (iz > -TOO_CLOSE_INNER)) {
-                                    // Competition! No thanks.
-                                    return;
-                                }
-                            }
-                        }
                     }
                 }
             }
 
             //If our conditions succeed
             if( water ) {
+                for(int ix = -TOO_CLOSE_INNER; ix <= TOO_CLOSE_INNER; ++ix ) {
+                    for(int iy = -1; iy <= 1; ++iy ) {
+                        for(int iz = -TOO_CLOSE_INNER; iz <= TOO_CLOSE_INNER; ++iz ) {
+                            BlockState surround = world.getBlockState(target_pos.offset(ix,iy,iz));
+                            if(surround.getBlock() == BlockRegistry.CLAM_SAND_BLOCK.get()) {
+                                // Competition! Do not spread.
+                                return;
+                            }
+                        }
+                    }
+                }
                 //Congrats! Clam reproduction.
                 world.setBlock(target_pos, BlockRegistry.CLAM_SAND_BLOCK.get().defaultBlockState(), 3);
             }
         }
+        //If resultSelector is between 10 and 20, do nothing.
     }
 
     @Override

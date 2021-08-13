@@ -110,7 +110,6 @@ public class YingletSkinManager {
         HashMap<UUID, SkinEntry> result = new HashMap<>();
 
         if(deserialized.length() > 8) {
-            System.out.println("It thinks the file is " + deserialized);
             JsonArray jsonArray = (JsonArray) (new JsonParser().parse(deserialized));
             Iterator<JsonElement> iter = jsonArray.iterator();
             while(iter.hasNext()) {
@@ -170,7 +169,7 @@ public class YingletSkinManager {
     public void loadIndexOnLaunch() {
         try {
             String filePath = getIndexFilePath();
-            System.out.println("Loading from " + filePath);
+            logger.log(Level.INFO,"Loading yinglet skin index from " + filePath);
             List<String> lines = Files.readAllLines(Paths.get(filePath), StandardCharsets.UTF_8);
             String idxFile = "";
             Iterator<String> iter = lines.iterator();
@@ -178,7 +177,7 @@ public class YingletSkinManager {
                 String newstring = idxFile.concat(iter.next());
                 idxFile = newstring;
             }
-            System.out.println("Index file (" + lines.size() +" lines) loaded as " + idxFile);
+            logger.log(Level.INFO,"Index file (" + lines.size() +" lines) loaded as " + idxFile);
             skinIndex = loadIndexFromJson(idxFile);
         } catch (IOException e) {
             e.printStackTrace();

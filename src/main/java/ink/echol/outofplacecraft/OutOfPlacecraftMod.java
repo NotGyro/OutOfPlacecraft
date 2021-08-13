@@ -56,7 +56,7 @@ public class OutOfPlacecraftMod
 {
     public static final String MODID = "outofplacecraft";
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger(OutOfPlacecraftMod.MODID);
 
     public static boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().
             getInputArguments().toString().indexOf("-agentlib:jdwp") > 0;

@@ -22,7 +22,6 @@ public class WorldEvents {
     public static ConfiguredFeature<?,?> CONFIGURED_UNDERWATER_CLAM_SAND;
 
     public static ConfiguredFeature<?,?> CONFIGURED_ARTIFACT_SAND;
-    public static ConfiguredFeature<?,?> CONFIGURED_UNDERWATER_ARTIFACT_SAND;
 
     public static void commonSetup(FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
@@ -34,7 +33,7 @@ public class WorldEvents {
                     ImmutableList.of(Blocks.SAND.defaultBlockState()), //In
                     ImmutableList.of(Blocks.AIR.defaultBlockState(), Blocks.WATER.defaultBlockState(), Blocks.SUGAR_CANE.defaultBlockState()) //Under
                 )
-            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(61, 0, 3))).squared().count(10);
+            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(61, 0, 3))).squared().count(5);
             // The way range placements work is, Y-level of first-argument + rand (between 0 and (third argument - second argument))
             // Range_biased is slightly different: it's Y-level of first + rand (between 0 and rand (between 0 and (third - second))), so rand gets called twice.
 
@@ -43,7 +42,7 @@ public class WorldEvents {
                             ImmutableList.of(Blocks.SAND.defaultBlockState()), //In
                             ImmutableList.of(Blocks.AIR.defaultBlockState(), Blocks.WATER.defaultBlockState(), Blocks.SUGAR_CANE.defaultBlockState()) //Under
                     )
-            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(31, 0, 30))).squared().count(16);
+            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(31, 0, 30))).squared().count(8);
 
             //------ ARTIFACT SAND ------
             CONFIGURED_ARTIFACT_SAND = Feature.SIMPLE_BLOCK.configured(new BlockWithContextConfig(BlockRegistry.ARTIFACT_SAND_BLOCK.get().defaultBlockState(),
@@ -51,20 +50,13 @@ public class WorldEvents {
                             ImmutableList.of(Blocks.SAND.defaultBlockState()), //In
                             ImmutableList.of(Blocks.AIR.defaultBlockState(), Blocks.WATER.defaultBlockState(), Blocks.SUGAR_CANE.defaultBlockState(), Blocks.SAND.defaultBlockState()) //Under
                     )
-            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(61, 0, 3))).squared().count(3);
-            CONFIGURED_UNDERWATER_ARTIFACT_SAND = Feature.SIMPLE_BLOCK.configured(new BlockWithContextConfig(BlockRegistry.ARTIFACT_SAND_BLOCK.get().defaultBlockState(),
-                            ImmutableList.of(Blocks.SAND.defaultBlockState(), Blocks.SANDSTONE.defaultBlockState(), Blocks.STONE.defaultBlockState(), Blocks.CLAY.defaultBlockState(), Blocks.DIRT.defaultBlockState()), //On
-                            ImmutableList.of(Blocks.SAND.defaultBlockState()), //In
-                            ImmutableList.of(Blocks.AIR.defaultBlockState(), Blocks.WATER.defaultBlockState(), Blocks.SUGAR_CANE.defaultBlockState(), Blocks.SAND.defaultBlockState()) //Under
-                    )
-            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(16, 0, 44))).squared().count(6);
+            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(20, 0, 44))).squared().count(3);
 
 
             Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, new ResourceLocation(OutOfPlacecraftMod.MODID, "clam_sand"), CONFIGURED_CLAM_SAND);
             Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, new ResourceLocation(OutOfPlacecraftMod.MODID, "underwater_clam_sand"), CONFIGURED_UNDERWATER_CLAM_SAND);
 
             Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, new ResourceLocation(OutOfPlacecraftMod.MODID, "artifact_sand"), CONFIGURED_ARTIFACT_SAND);
-            Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, new ResourceLocation(OutOfPlacecraftMod.MODID, "underwater_artifact_sand"), CONFIGURED_UNDERWATER_ARTIFACT_SAND);
         });
     }
     //@SubscribeEvent
@@ -75,7 +67,6 @@ public class WorldEvents {
             event.getGeneration().getFeatures(GenerationStage.Decoration.TOP_LAYER_MODIFICATION).add(() -> CONFIGURED_UNDERWATER_CLAM_SAND);
 
             event.getGeneration().getFeatures(GenerationStage.Decoration.TOP_LAYER_MODIFICATION).add(() -> CONFIGURED_ARTIFACT_SAND);
-            event.getGeneration().getFeatures(GenerationStage.Decoration.TOP_LAYER_MODIFICATION).add(() -> CONFIGURED_UNDERWATER_ARTIFACT_SAND);
         }
     }
 }

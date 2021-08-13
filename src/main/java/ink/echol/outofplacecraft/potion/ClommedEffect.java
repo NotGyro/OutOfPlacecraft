@@ -32,4 +32,8 @@ public class ClommedEffect extends Effect implements IForgeEffect {
     public void applyEffectTick(LivingEntity p_76394_1_, int p_76394_2_) {
         super.applyEffectTick(p_76394_1_, p_76394_2_);
     }
+    @Override
+    public boolean isBeneficial() {
+        return true;
+    }
 }

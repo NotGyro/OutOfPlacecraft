@@ -24,9 +24,7 @@ public abstract class MixinEntityRendererManager {
                 ISpecies cap = capOpt.orElseThrow(NullPointerException::new);
                 if(cap.isYinglet()) {
                     //Class<?>[] interfaces = AbstractClientPlayerEntity.class.getInterfaces();
-                    //System.out.println(interfaces);
                     //We're rendering a little guy!
-                    //
                     if(player instanceof IAnimatable) {
                         //System.out.println("It's alive, it's ALIIIIVE!");
                         //I was able to get here.

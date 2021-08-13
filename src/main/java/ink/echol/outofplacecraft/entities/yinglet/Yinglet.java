@@ -86,10 +86,6 @@ public class Yinglet extends CreatureEntity implements IAnimatable {
 	@OnlyIn(Dist.CLIENT)
 	@SubscribeEvent
 	public static void registerRenderers(final FMLClientSetupEvent event) {
-		System.out.println(ENTITY_TYPE.getRegistryName().toString());
-
-		System.out.println(Yinglet.class.getSimpleName().toLowerCase());
-
 		RenderingRegistry.registerEntityRenderingHandler(
 				ENTITY_TYPE,
 				YingletRenderer::new

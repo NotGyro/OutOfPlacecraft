@@ -7,6 +7,7 @@ import ink.echol.outofplacecraft.capabilities.SpeciesCapability;
 import ink.echol.outofplacecraft.capabilities.SpeciesHelper;
 import ink.echol.outofplacecraft.items.ZatZhingItem;
 import ink.echol.outofplacecraft.net.OOPCPacketHandler;
+import ink.echol.outofplacecraft.net.SpeciesPacket;
 import ink.echol.outofplacecraft.net.SyncSkinPkt;
 import ink.echol.outofplacecraft.net.YingletSkinManager;
 import ink.echol.outofplacecraft.potion.PotionRegistry;
@@ -14,15 +15,18 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.item.Items;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.Util;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.living.PotionEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,6 +34,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
 import org.apache.logging.log4j.Level;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -44,7 +49,7 @@ public class EntityEventHandler {
     public static final EntitySize YINGLET_SIZE_STANDING = new EntitySize(0.5f, 1.25f, false);
     public static final EntitySize YINGLET_SIZE_CROUCH = new EntitySize(0.5f, 0.8f, false);
 
-    public static final float YINGLET_FALL_DAMAGE_MUL = 0.15f;
+    public static final float YINGLET_FALL_DAMAGE_MUL = 0.5f;
     public static final float YINGLET_VISIBILITY_MODIFIER = 0.75f;
 
     @SubscribeEvent
@@ -92,36 +97,49 @@ public class EntityEventHandler {
 
             Effect effect = event.getPotionEffect().getEffect();
 
-            if (SpeciesHelper.getPlayerSpecies(player) == SpeciesCapability.YINGLET_ID) {
-                // Cancel out the verious things yinglets are immune to.
-                if(effect == Effects.POISON) {
-                    event.setResult(Event.Result.DENY);
-                }
-                if(effect == Effects.HUNGER) {
-                    event.setResult(Event.Result.DENY);
-                }
-                // Beneficial effects of eating clams.
-                if(effect == PotionRegistry.CLOMMED.get()) {
-                    player.forceAddEffect(new EffectInstance(Effects.REGENERATION, 130, 1) );
-                    player.forceAddEffect(new EffectInstance(Effects.LUCK, 1800) );
+            if( effect != null ) {
+                if (SpeciesHelper.getPlayerSpecies(player) == SpeciesCapability.YINGLET_ID) {
+                    // Cancel out the verious things yinglets are immune to.
+                    if(effect == Effects.POISON) {
+                        event.setResult(Event.Result.DENY);
+                        player.removeEffect(effect);
+                    }
+                    //We used to disable hunger here but instead I'm just going to explicitly add an effect for rotten flesh.
+                    // Beneficial effects of eating clams.
+                    if(PotionRegistry.CLOMMED != null) {
+                        if(PotionRegistry.CLOMMED.get() != null) {
+                            if(effect == PotionRegistry.CLOMMED.get()) {
+                                if(!player.level.isClientSide()) {
+                                    player.addEffect(new EffectInstance(Effects.REGENERATION, 130, 1) );
+                                    //player.addEffect(new EffectInstance(Effects.LUCK, 1800) );
 
-                    player.heal(5.0f);
+                                    player.heal(2.0f);
 
-                    Collection<EffectInstance> oldEffects = player.getActiveEffects();
-                    for(EffectInstance eff : oldEffects) {
-                        if(!eff.getEffect().isBeneficial()) {
-                            player.removeEffect(eff.getEffect());
+                                    ArrayList<Effect> toRemove = new ArrayList<>();
+
+                                    Collection<EffectInstance> oldEffects = player.getActiveEffects();
+                                    for(EffectInstance eff : oldEffects) {
+                                        if(!eff.getEffect().isBeneficial()) {
+                                            toRemove.add(eff.getEffect());
+                                        }
+                                    }
+                                    for(Effect e : toRemove) {
+                                        player.removeEffect(e);
+                                    }
+                                }
+
+                                //Clommed doesn't actually exist. It's just glue.
+                                event.setResult(Event.Result.DENY);
+                                player.removeEffect(effect);
+                            }
                         }
                     }
-
-                    //Clommed doesn't actually exist. It's just glue.
-                    event.setResult(Event.Result.DENY);
                 }
-            }
-            else {
-                //Remove "Clommed" from human players
-                if(effect == PotionRegistry.CLOMMED.get()) {
-                    event.setResult(Event.Result.DENY);
+                else {
+                    //Remove "Clommed" from human players
+                    if(effect == PotionRegistry.CLOMMED.get()) {
+                        event.setResult(Event.Result.DENY);
+                    }
                 }
             }
         }
@@ -140,9 +158,6 @@ public class EntityEventHandler {
                 if(effect == Effects.POISON) {
                     event.setResult(Event.Result.DENY);
                 }
-                if(effect == Effects.HUNGER) {
-                    event.setResult(Event.Result.DENY);
-                }
             }
             else {
                 //Remove "Clommed" from human players
@@ -153,6 +168,43 @@ public class EntityEventHandler {
         }
     }
 
+    @SubscribeEvent
+    public static void breadBehavior(LivingEntityUseItemEvent.Finish event) {
+        if( event.getEntityLiving() instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) event.getEntityLiving();
+            if(SpeciesHelper.getPlayerSpecies(player) == SpeciesCapability.YINGLET_ID) {
+                if(event.getItem().getItem() == Items.BREAD) {
+                    //Bread is not healthy for yings D:
+                    if(player.level.isClientSide()) {
+                        player.sendMessage((new TranslationTextComponent("chat.outofplacecraft.yingletVomitBread")).withStyle(TextFormatting.DARK_GREEN), Util.NIL_UUID);
+                    }
+                    int foodLevel = (player.getFoodData().getFoodLevel()/3)-1;
+                    foodLevel = Math.min(foodLevel, 4);
+                    if(foodLevel < 0) {
+                        foodLevel = 0;
+                    }
+                    float satLevel = (player.getFoodData().getSaturationLevel()/3.0f)-1.0f;
+                    satLevel = Math.min(satLevel, 4.0f);
+                    if(satLevel < 0.0f) {
+                        satLevel = 0.0f;
+                    }
+                    player.getFoodData().setFoodLevel(foodLevel);
+                    player.getFoodData().setSaturation(satLevel);
+                    player.addEffect(new EffectInstance(Effects.HUNGER, 90, 0));
+                    player.addEffect(new EffectInstance(Effects.WEAKNESS, 300, 1));
+                }
+                else if(event.getItem().getItem() == Items.ROTTEN_FLESH) {
+                    //Yinglets are sometimes derogatorily called "scavs" - scavengers.
+                    //This is because they scavenge. Like hyenas or vultures, they have evolved to eat dead things.
+
+                    if(player.hasEffect(Effects.HUNGER)) {
+                        OutOfPlacecraftMod.LOGGER.log(Level.INFO, "Removing a yinglet player's Hunger effect after eating rotten flesh.");
+                        player.removeEffect(Effects.HUNGER);
+                    }
+                }
+            }
+        }
+    }
     @SubscribeEvent
     public static void modifyFall(LivingFallEvent event) {
         if( event.getEntityLiving() instanceof PlayerEntity) {
@@ -176,6 +228,26 @@ public class EntityEventHandler {
     }
 
     @SubscribeEvent
+    public static void preventFallDeath(LivingHurtEvent event) {
+        if(event.getSource() == DamageSource.FALL) {
+            if (event.getEntityLiving() instanceof PlayerEntity) {
+                PlayerEntity player = (PlayerEntity) event.getEntityLiving();
+                if (SpeciesHelper.getPlayerSpecies(player) == SpeciesCapability.YINGLET_ID) {
+                    float playerHealth = player.getHealth();
+                    if(event.getAmount() >= playerHealth) {
+                        //Yinglets cannot die by falling.
+                        float amount = playerHealth - 0.5f;
+                        if( amount < 0.0f ) {
+                            amount = 0.0f;
+                        }
+                        event.setAmount(amount);
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
         // Persist across player deaths & returning from the End.
         int oldSpecies = SpeciesHelper.getPlayerSpecies(event.getOriginal());
@@ -184,8 +256,9 @@ public class EntityEventHandler {
         newCap.setSpecies(oldSpecies);
         if (event.getPlayer() instanceof ServerPlayerEntity) {
             // If we're on server-side, notify the client.
-            SpeciesHelper.syncSpeciesToClient(event.getPlayer(), event.getPlayer());
-            ZatZhingItem.applyMaxHealthEffect(event.getPlayer());
+            SpeciesPacket pkt = new SpeciesPacket(event.getPlayer().getUUID(), oldSpecies, false);
+            OOPCPacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), pkt);
+            ZatZhingItem.fixMaxHealth(event.getPlayer());
         }
     }
 
@@ -221,7 +294,10 @@ public class EntityEventHandler {
     public static void onPlayerLogIn(PlayerEvent.PlayerLoggedInEvent event) {
         PlayerEntity player = event.getPlayer();
         if (player instanceof ServerPlayerEntity) {
-            SpeciesHelper.syncSpeciesToClient(player, player);
+            int speciesId = SpeciesHelper.getPlayerSpecies(player);
+            SpeciesPacket pkt = new SpeciesPacket(event.getPlayer().getUUID(), speciesId, false);
+            OOPCPacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), pkt);
+            ZatZhingItem.fixMaxHealth(event.getPlayer());
 
             //Handle skin stuff.
             YingletSkinManager.getServer().syncAllSkinsTo(player);
@@ -232,7 +308,10 @@ public class EntityEventHandler {
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         PlayerEntity player = event.getPlayer();
         if (player instanceof ServerPlayerEntity) {
-            SpeciesHelper.syncSpeciesToClient(player, player);
+            int speciesId = SpeciesHelper.getPlayerSpecies(player);
+            SpeciesPacket pkt = new SpeciesPacket(event.getPlayer().getUUID(), speciesId, false);
+            OOPCPacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), pkt);
+            ZatZhingItem.fixMaxHealth(event.getPlayer());
         }
     }
 
@@ -244,7 +323,10 @@ public class EntityEventHandler {
         if (player instanceof ServerPlayerEntity) {
             if( (((ServerPlayerEntity) player).getLevel().getGameTime() % YING_STATUS_UPDATE_TICK_DELAY ) == 0) {
                 //It is the appointed time! Let's do this.
-                SpeciesHelper.syncSpeciesToClient(player, player);
+                int speciesId = SpeciesHelper.getPlayerSpecies(player);
+                SpeciesPacket pkt = new SpeciesPacket(player.getUUID(), speciesId, false);
+                OOPCPacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), pkt);
+                ZatZhingItem.fixMaxHealth(player);
             }
             if( (((ServerPlayerEntity) player).getLevel().getGameTime() % 512 ) == 0) {
                 //Handle skin stuff.
@@ -254,6 +336,20 @@ public class EntityEventHandler {
 
         if( (player.level.getGameTime() % PLAYER_DIMENSIONS_REFRESH_DELAY ) == 0) {
             player.refreshDimensions();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        PlayerEntity player = event.getPlayer();
+        if (player instanceof ServerPlayerEntity) {
+            int speciesId = SpeciesHelper.getPlayerSpecies(player);
+            SpeciesPacket pkt = new SpeciesPacket(event.getPlayer().getUUID(), speciesId, false);
+            OOPCPacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), pkt);
+            ZatZhingItem.fixMaxHealth(event.getPlayer());
+
+            //Handle skin stuff.
+            YingletSkinManager.getServer().syncAllSkinsTo(player);
         }
     }
 }

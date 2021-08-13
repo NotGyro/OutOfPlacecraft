@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import ink.echol.outofplacecraft.capabilities.SpeciesHelper;
+import ink.echol.outofplacecraft.items.ZatZhingItem;
 import ink.echol.outofplacecraft.net.YingletSkinManager;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -71,6 +72,7 @@ public class OOPCCommands {
                         }
                     }
                 }
+                ZatZhingItem.fixMaxHealth(player);
             }
         }
         return targets.size();

@@ -1,15 +1,20 @@
 package ink.echol.outofplacecraft.net;
 
+import ink.echol.outofplacecraft.OutOfPlacecraftMod;
 import ink.echol.outofplacecraft.capabilities.CapabilityRegistry;
 import ink.echol.outofplacecraft.capabilities.ISpecies;
 import ink.echol.outofplacecraft.capabilities.SpeciesCapability;
 import ink.echol.outofplacecraft.capabilities.SpeciesHelper;
+import ink.echol.outofplacecraft.items.ZatZhingItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fml.network.PacketDistributor;
+import org.apache.logging.log4j.Level;
+
 import java.util.function.Supplier;
 
 import java.util.UUID;
@@ -53,18 +58,22 @@ public class SpeciesPacket {
                 assert world != null;
                 PlayerEntity player = world.getPlayerByUUID(msg.player);
                 if(player != null) {
-                    System.out.println("Species ID of player: <");
-                    System.out.print(player.getScoreboardName());
-                    System.out.print("> is ");
-                    System.out.print(msg.speciesId);
+                    OutOfPlacecraftMod.LOGGER.log(Level.INFO, "Species ID of player: <" + player.getScoreboardName() + "> is " + msg.speciesId);
                     if(playerLocal.getGameProfile().getId().equals(msg.player)) {
                         if(msg.speciesId == SpeciesCapability.YINGLET_ID) {
                             //We may have just been zat zing'd, maybe do something special!
                             //TODO invoke some cool rendering madness here
-                            System.out.println("Zat's you! Wehh");
+                            OutOfPlacecraftMod.LOGGER.log(Level.INFO, "Zat's you! Wehh");
                         }
                     }
-                    SpeciesHelper.setPlayerSpecies(player, msg.speciesId);
+                    ISpecies cap = player.getCapability(CapabilityRegistry.SPECIES_CAPABILITY, null)
+                            .orElse(new SpeciesCapability.Implementation(SpeciesCapability.HUMAN_ID));
+                    cap.setSpecies(msg.speciesId);
+                    // Make sure max health is consistent with species. Must be called AFTER setSpecies.
+                    ZatZhingItem.fixMaxHealth(player);
+
+                    // Make sure eye-height and hitbox are updated correctly.
+                    player.refreshDimensions();
                 }
             });
             ctx.get().setPacketHandled(true);

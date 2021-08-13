@@ -1,8 +1,10 @@
 package ink.echol.outofplacecraft.items;
 
+import ink.echol.outofplacecraft.OutOfPlacecraftMod;
 import ink.echol.outofplacecraft.capabilities.CapabilityRegistry;
 import ink.echol.outofplacecraft.capabilities.ISpecies;
 import ink.echol.outofplacecraft.capabilities.SpeciesCapability;
+import ink.echol.outofplacecraft.capabilities.SpeciesHelper;
 import ink.echol.outofplacecraft.net.OOPCPacketHandler;
 import ink.echol.outofplacecraft.net.SpeciesPacket;
 import net.minecraft.advancements.CriteriaTriggers;
@@ -15,13 +17,15 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.entity.projectile.PotionEntity;
 import net.minecraft.item.*;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.util.*;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
+import org.apache.logging.log4j.Level;
 
+import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 
 public class ZatZhingItem extends Item {
@@ -116,34 +120,45 @@ public class ZatZhingItem extends Item {
     }
 
     public static final float SCALE_HEALTH = -0.4f;
+    public static final AttributeModifier YINGLET_HEALTH_MODIFIER = new AttributeModifier("yinglet_health_reduce", SCALE_HEALTH, AttributeModifier.Operation.MULTIPLY_BASE);
 
     public static void applyMaxHealthEffect(PlayerEntity player) {
-        AttributeModifier modifier = new AttributeModifier("yinglet_health_reduce", SCALE_HEALTH, AttributeModifier.Operation.MULTIPLY_BASE);
-        if(!player.getAttribute(Attributes.MAX_HEALTH).hasModifier(modifier)) {
-            player.getAttribute(Attributes.MAX_HEALTH).addPermanentModifier(modifier);
+        if (!player.getAttribute(Attributes.MAX_HEALTH).hasModifier(YINGLET_HEALTH_MODIFIER)) {
+            if (player.getAttribute(Attributes.MAX_HEALTH).getValue() == player.getAttribute(Attributes.MAX_HEALTH).getBaseValue()) {
+                if (SpeciesHelper.getPlayerSpecies(player) == SpeciesCapability.YINGLET_ID) {
+                    player.getAttribute(Attributes.MAX_HEALTH).addPermanentModifier(YINGLET_HEALTH_MODIFIER);
+                }
+            }
+        } else {
+            if (SpeciesHelper.getPlayerSpecies(player) != SpeciesCapability.YINGLET_ID) {
+                player.getAttribute(Attributes.MAX_HEALTH).removePermanentModifier(YINGLET_HEALTH_MODIFIER.getId());
+            }
         }
+    }
+
+    public static void fixMaxHealth(PlayerEntity player) {
+        Set<AttributeModifier> modifiers = player.getAttribute(Attributes.MAX_HEALTH).getModifiers();
+        Iterator<AttributeModifier> iter = modifiers.iterator();
+        while(iter.hasNext()) {
+            AttributeModifier mod = iter.next();
+            if( mod.getName().equalsIgnoreCase("yinglet_health_reduce") ) {
+                player.getAttribute(Attributes.MAX_HEALTH).removePermanentModifier(mod.getId());
+            }
+        }
+        applyMaxHealthEffect(player);
     }
 
     // Method for entering my magical realm. >:}
     // Returns true if we should consume the item - false if it didn't get used and won't be consumed.
     public static void applyZhingEffect(ItemStack stack, World world, PlayerEntity player) {
+        player.sendMessage((new TranslationTextComponent("chat.outofplacecraft.yingletTransformation")).withStyle(TextFormatting.GREEN), Util.NIL_UUID);
         // This will probably never be called client-side, but... better safe than sorry.
         if(!world.isClientSide) {
-            ISpecies cap = player.getCapability(CapabilityRegistry.SPECIES_CAPABILITY).orElseThrow(NullPointerException::new);
             // Oops.
-            cap.setSpecies(SpeciesCapability.YINGLET_ID);
-            // TODO remove this before release.
-            System.out.println("Player has been zat zing'd: ");
-            System.out.print(player.getScoreboardName());
+            OutOfPlacecraftMod.LOGGER.log(Level.INFO, "A player has been \"zat zhing\"'d: " + player.getScoreboardName());
 
-            applyMaxHealthEffect(player);
-            // We are necessarily serverside. Send a packet.
-            ISpecies targetCap = player.getCapability(CapabilityRegistry.SPECIES_CAPABILITY).orElseThrow(NullPointerException::new);
-            UUID targetUUID = player.getGameProfile().getId();
-
-            // Last argument on YingletStatusPacket's constructor true for "this is a transformation."
-            SpeciesPacket pkt = new SpeciesPacket(targetUUID, SpeciesCapability.YINGLET_ID, true);
-            OOPCPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player), pkt);
+            SpeciesHelper.setPlayerSpecies(player, SpeciesCapability.YINGLET_ID);
+            fixMaxHealth(player);
         }
     }
 }
