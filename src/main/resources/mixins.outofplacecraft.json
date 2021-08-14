@@ -9,5 +9,8 @@
     "MixinAbstractClientPlayerEntity",
     "MixinEntityRendererManager",
     "MixinFirstPersonRenderer"
+  ],
+  "mixins": [
+    "MixinPlayerEntity"
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "_comment": "Out Of Placecraft - Русская локализация",
+  "chat.outofplacecraft.yingletTransformation": "По телу распространяется ощущение холода и жжения. \nКости в твоем теле скручиваются и трескаються трансформируя тебя. \nВ панике пришло осознание... Теперь ты - Йинглет!",
+  "chat.outofplacecraft.yingletVomitBread": "Твое новое тело отвергает хлеб! Тебя начинает тошнить.",
+  "block.outofplacecraft.clam_sand": "Песок с устрицей.",
+  "block.outofplacecraft.artifact_sand": "Песок с артефактом.",
+  "item.outofplacecraft.zatzhing": "Таинственный кристалл",
+  "item.outofplacecraft.clam": "Устрица",
+  "item.outofplacecraft.cooked_clam": "Приготовленная устрица"
+}

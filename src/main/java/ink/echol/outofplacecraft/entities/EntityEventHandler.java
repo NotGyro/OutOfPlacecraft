@@ -13,6 +13,7 @@ import ink.echol.outofplacecraft.net.YingletSkinManager;
 import ink.echol.outofplacecraft.potion.PotionRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntitySize;
+import net.minecraft.entity.Pose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Items;
@@ -44,10 +45,10 @@ public class EntityEventHandler {
     private static final long YING_STATUS_UPDATE_TICK_DELAY = 1024; // 51.2 seconds, just a pinch less than a minute.
     private static final long PLAYER_DIMENSIONS_REFRESH_DELAY = 64;
 
-    public static final float YINGLET_EYE_HEIGHT_SCALE_STANDING = 0.71f;
-    public static final float YINGLET_EYE_HEIGHT_SCALE_CROUCHING = 0.6f;
-    public static final EntitySize YINGLET_SIZE_STANDING = new EntitySize(0.5f, 1.25f, false);
-    public static final EntitySize YINGLET_SIZE_CROUCH = new EntitySize(0.5f, 0.8f, false);
+    public static final float YINGLET_EYE_HEIGHT_SCALE_STANDING = 0.85f;
+    public static final float YINGLET_EYE_HEIGHT_SCALE_CROUCHING = 0.70f;
+    public static final EntitySize YINGLET_SIZE_STANDING = EntitySize.scalable(0.5f, 1.25f);
+    public static final EntitySize YINGLET_SIZE_CROUCH = EntitySize.scalable(0.4f, 0.9f);
 
     public static final float YINGLET_FALL_DAMAGE_MUL = 0.5f;
     public static final float YINGLET_VISIBILITY_MODIFIER = 0.75f;
@@ -79,16 +80,18 @@ public class EntityEventHandler {
         }
         PlayerEntity player = (PlayerEntity)event.getEntity();
 
+        //player.setForcedPose(Pose.SWIMMING);
         if(SpeciesHelper.getPlayerSpecies(player) == SpeciesCapability.YINGLET_ID) {
             if(player.isCrouching()) {
                 event.setNewSize(YINGLET_SIZE_CROUCH, false);
-                event.setNewEyeHeight(event.getNewEyeHeight()*YINGLET_EYE_HEIGHT_SCALE_CROUCHING);
+                event.setNewEyeHeight((float) YINGLET_SIZE_CROUCH.height * YINGLET_EYE_HEIGHT_SCALE_CROUCHING);
             } else {
                 event.setNewSize(YINGLET_SIZE_STANDING, false);
-                event.setNewEyeHeight(event.getNewEyeHeight()*YINGLET_EYE_HEIGHT_SCALE_STANDING);
+                event.setNewEyeHeight((float) YINGLET_SIZE_STANDING.height * YINGLET_EYE_HEIGHT_SCALE_STANDING);
             }
         }
     }
+
     @SubscribeEvent
     public static void potionAdded(PotionEvent.PotionAddedEvent event) {
         if( event.getEntityLiving() instanceof PlayerEntity) {
@@ -260,6 +263,7 @@ public class EntityEventHandler {
             OOPCPacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), pkt);
             ZatZhingItem.fixMaxHealth(event.getPlayer());
         }
+        event.getPlayer().refreshDimensions();
     }
 
     /**
@@ -288,6 +292,7 @@ public class EntityEventHandler {
                 SpeciesHelper.syncSpeciesToClient(sendTo, target);
             }
         }
+        event.getPlayer().refreshDimensions();
     }
 
     @SubscribeEvent
@@ -302,6 +307,7 @@ public class EntityEventHandler {
             //Handle skin stuff.
             YingletSkinManager.getServer().syncAllSkinsTo(player);
         }
+        event.getPlayer().refreshDimensions();
     }
 
     @SubscribeEvent
@@ -313,6 +319,7 @@ public class EntityEventHandler {
             OOPCPacketHandler.INSTANCE.send(PacketDistributor.ALL.noArg(), pkt);
             ZatZhingItem.fixMaxHealth(event.getPlayer());
         }
+        event.getPlayer().refreshDimensions();
     }
 
     @SubscribeEvent
@@ -351,5 +358,6 @@ public class EntityEventHandler {
             //Handle skin stuff.
             YingletSkinManager.getServer().syncAllSkinsTo(player);
         }
+        event.getPlayer().refreshDimensions();
     }
 }

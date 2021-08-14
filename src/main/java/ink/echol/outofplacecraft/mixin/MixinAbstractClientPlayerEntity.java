@@ -103,11 +103,11 @@ public abstract class MixinAbstractClientPlayerEntity {
 
         if ( thisPlayer.attackAnim > attack_anim_min) {
             if( thisPlayer.swingingArm == Hand.MAIN_HAND ) {
-                ab = ab.addAnimation("animation.yinglet.INTERACT_ATTACK_RIGHT", true);
+                ab = ab.addAnimation("animation.yinglet.INTERACT_ATTACK_LEFT", true);
                 idle = false;
             }
             else {
-                ab = ab.addAnimation("animation.yinglet.INTERACT_ATTACK_LEFT", true);
+                ab = ab.addAnimation("animation.yinglet.INTERACT_ATTACK_RIGHT", true);
                 idle = false;
             }
         }
