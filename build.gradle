@@ -21,13 +21,13 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
-        maven { url = 'https://repo.spongepowered.org/maven' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
         mavenCentral()
         gradlePluginPortal()
 
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
@@ -138,7 +138,7 @@ repositories {
     maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
 }
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.1.23'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.35'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -160,7 +160,7 @@ dependencies {
 
 
     // GeckoLib:
-    implementation fg.deobf('software.bernie.geckolib:geckolib-forge-1.16.5:3.0.41')
+    implementation fg.deobf('software.bernie.geckolib:geckolib-forge-1.16.5:3.0.77')
 
     // Mixins:
     annotationProcessor 'org.spongepowered:mixin:0.8.3:processor' //For mixins.
