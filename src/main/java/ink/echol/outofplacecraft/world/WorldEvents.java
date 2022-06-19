@@ -50,7 +50,7 @@ public class WorldEvents {
                             ImmutableList.of(Blocks.SAND.defaultBlockState()), //In
                             ImmutableList.of(Blocks.AIR.defaultBlockState(), Blocks.WATER.defaultBlockState(), Blocks.SUGAR_CANE.defaultBlockState(), Blocks.SAND.defaultBlockState()) //Under
                     )
-            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(20, 0, 44))).squared().count(3);
+            ).decorated(Placement.RANGE.configured(new TopSolidRangeConfig(30, 0, 34))).squared().count(3);
 
 
             Registry.register(WorldGenRegistries.CONFIGURED_FEATURE, new ResourceLocation(OutOfPlacecraftMod.MODID, "clam_sand"), CONFIGURED_CLAM_SAND);
