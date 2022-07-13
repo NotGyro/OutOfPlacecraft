@@ -23,8 +23,7 @@ public class ItemRegistry {
 
     // ITEMS
     public static final RegistryObject<Item> CLAM = ITEMS.register("clam",
-            () -> new Item(new Item.Properties().tab(ItemGroup.TAB_FOOD).food(new Food.Builder().meat().alwaysEat().nutrition(3).saturationMod(0.4f)
-                    .effect(() -> new EffectInstance(PotionRegistry.CLOMMED.get()), 1.0f).build()).stacksTo(16))
+            () -> new Item(new Item.Properties().tab(ItemGroup.TAB_FOOD).food(new Food.Builder().meat().alwaysEat().nutrition(3).saturationMod(0.4f).build()).stacksTo(16))
     );
     public static final RegistryObject<Item> COOKED_CLAM = ITEMS.register("cooked_clam",
             () -> new Item(new Item.Properties().tab(ItemGroup.TAB_FOOD).food(new Food.Builder().nutrition(5).fast().saturationMod(0.7f).build()).stacksTo(16))

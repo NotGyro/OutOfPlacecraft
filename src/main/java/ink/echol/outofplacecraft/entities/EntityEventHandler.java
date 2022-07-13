@@ -5,6 +5,7 @@ import ink.echol.outofplacecraft.capabilities.CapabilityRegistry;
 import ink.echol.outofplacecraft.capabilities.ISpecies;
 import ink.echol.outofplacecraft.capabilities.SpeciesCapability;
 import ink.echol.outofplacecraft.capabilities.SpeciesHelper;
+import ink.echol.outofplacecraft.config.CommonConfig;
 import ink.echol.outofplacecraft.items.ZatZhingItem;
 import ink.echol.outofplacecraft.net.OOPCPacketHandler;
 import ink.echol.outofplacecraft.net.SpeciesPacket;
@@ -20,6 +21,7 @@ import net.minecraft.item.Items;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.Effects;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.TextFormatting;
@@ -109,6 +111,7 @@ public class EntityEventHandler {
                     }
                     //We used to disable hunger here but instead I'm just going to explicitly add an effect for rotten flesh.
                     // Beneficial effects of eating clams.
+                    // TODO - move into the "on eat" entity events? This has no reason to be a potion effect now.
                     if(PotionRegistry.CLOMMED != null) {
                         if(PotionRegistry.CLOMMED.get() != null) {
                             if(effect == PotionRegistry.CLOMMED.get()) {
@@ -176,33 +179,43 @@ public class EntityEventHandler {
         if( event.getEntityLiving() instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) event.getEntityLiving();
             if(SpeciesHelper.getPlayerSpecies(player) == SpeciesCapability.YINGLET_ID) {
-                if(event.getItem().getItem() == Items.BREAD) {
-                    //Bread is not healthy for yings D:
-                    if(player.level.isClientSide()) {
-                        player.sendMessage((new TranslationTextComponent("chat.outofplacecraft.yingletVomitBread")).withStyle(TextFormatting.DARK_GREEN), Util.NIL_UUID);
-                    }
-                    int foodLevel = (player.getFoodData().getFoodLevel()/3)-1;
-                    foodLevel = Math.min(foodLevel, 4);
-                    if(foodLevel < 0) {
-                        foodLevel = 0;
-                    }
-                    float satLevel = (player.getFoodData().getSaturationLevel()/3.0f)-1.0f;
-                    satLevel = Math.min(satLevel, 4.0f);
-                    if(satLevel < 0.0f) {
-                        satLevel = 0.0f;
-                    }
-                    player.getFoodData().setFoodLevel(foodLevel);
-                    player.getFoodData().setSaturation(satLevel);
-                    player.addEffect(new EffectInstance(Effects.HUNGER, 90, 0));
-                    player.addEffect(new EffectInstance(Effects.WEAKNESS, 300, 1));
-                }
-                else if(event.getItem().getItem() == Items.ROTTEN_FLESH) {
-                    //Yinglets are sometimes derogatorily called "scavs" - scavengers.
-                    //This is because they scavenge. Like hyenas or vultures, they have evolved to eat dead things.
+                if(event.getItem().getItem() != null) {
 
-                    if(player.hasEffect(Effects.HUNGER)) {
-                        OutOfPlacecraftMod.LOGGER.log(Level.INFO, "Removing a yinglet player's Hunger effect after eating rotten flesh.");
-                        player.removeEffect(Effects.HUNGER);
+                    String itemName = event.getItem().getItem().getRegistryName().toString();
+
+                    if( CommonConfig.BREADLIKE.get().contains(itemName) ) {
+                        //Bread is not healthy for yings D:
+                        if(player.level.isClientSide()) {
+                            player.sendMessage((new TranslationTextComponent("chat.outofplacecraft.yingletVomitBread")).withStyle(TextFormatting.DARK_GREEN), Util.NIL_UUID);
+                        }
+                        int foodLevel = (player.getFoodData().getFoodLevel()/3)-1;
+                        foodLevel = Math.min(foodLevel, 4);
+                        if(foodLevel < 0) {
+                            foodLevel = 0;
+                        }
+                        float satLevel = (player.getFoodData().getSaturationLevel()/3.0f)-1.0f;
+                        satLevel = Math.min(satLevel, 4.0f);
+                        if(satLevel < 0.0f) {
+                            satLevel = 0.0f;
+                        }
+                        player.getFoodData().setFoodLevel(foodLevel);
+                        player.getFoodData().setSaturation(satLevel);
+                        player.addEffect(new EffectInstance(Effects.HUNGER, 90, 0));
+                        player.addEffect(new EffectInstance(Effects.WEAKNESS, 300, 1));
+                    }
+                    else if(CommonConfig.CLAMLIKE.get().contains(itemName)) {
+                        if(!player.hasEffect(PotionRegistry.CLOMMED.get())) {
+                            player.addEffect(new EffectInstance(PotionRegistry.CLOMMED.get()));
+                        }
+                    }
+                    else if( CommonConfig.ROTTEN.get().contains(itemName) ) {
+                        //Yinglets are sometimes derogatorily called "scavs" - scavengers.
+                        //This is because they scavenge. Like hyenas or vultures, they have evolved to eat dead things.
+
+                        if(player.hasEffect(Effects.HUNGER)) {
+                            OutOfPlacecraftMod.LOGGER.log(Level.INFO, "Removing a yinglet player's Hunger effect after eating rotten flesh.");
+                            player.removeEffect(Effects.HUNGER);
+                        }
                     }
                 }
             }
