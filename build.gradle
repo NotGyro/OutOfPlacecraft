@@ -69,7 +69,8 @@ minecraft {
     //
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: 'official', version: '1.16.5'
+    mappings channel: 'official', version: '1.18.2'
+    
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
     // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -138,7 +139,7 @@ repositories {
     maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
 }
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.35'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.2.0'
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -160,7 +161,7 @@ dependencies {
 
 
     // GeckoLib:
-    implementation fg.deobf('software.bernie.geckolib:geckolib-forge-1.16.5:3.0.77')
+    implementation fg.deobf('software.bernie.geckolib:geckolib-forge-1.18:3.0.56')
 
     // Mixins:
     annotationProcessor 'org.spongepowered:mixin:0.8.3:processor' //For mixins.
